@@ -3,6 +3,7 @@ package handlers
 import (
 	"disney/database"
 	"disney/models"
+	"disney/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -73,11 +74,21 @@ func Signup(c *gin.Context) {
 	}
 
 	// Create new user with fields from User model
+	// Hash the password before storing
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, AuthResponse{
+			Message: "Error processing password",
+			Error:   err.Error(),
+		})
+		return
+	}
+
 	newUser := models.User{
 		Name:         req.Name,
 		Email:        req.Email,
-		PasswordHash: req.Role, 
-		Role:         "user",   
+		PasswordHash: hashedPassword, // Store hashed password
+		Role:         req.Role,       // Use role from request
 	}
 
 	// Save user to database
@@ -119,7 +130,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	
+	// Find user by email from User model
 	var user models.User
 	if result := database.DB.Where("email = ?", req.Email).First(&user); result.RowsAffected == 0 {
 		c.JSON(http.StatusUnauthorized, AuthResponse{
@@ -129,9 +140,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	
-
-	if req.Password != user.PasswordHash {
+	// Verify password using bcrypt
+	if !utils.VerifyPassword(user.PasswordHash, req.Password) {
 		c.JSON(http.StatusUnauthorized, AuthResponse{
 			Message: "Authentication failed",
 			Error:   "Invalid email or password",
@@ -139,7 +149,15 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	
+	// Generate JWT token (only on successful login)
+	token, err := utils.GenerateToken(user.ID, user.Email, user.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, AuthResponse{
+			Message: "Error generating token",
+			Error:   err.Error(),
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, AuthResponse{
 		Message: "Login successful",
@@ -153,6 +171,6 @@ func Login(c *gin.Context) {
 				UpdatedAt: user.UpdatedAt.String(),
 			},
 		},
-		Token: "jwt_token_placeholder", // TODO: Replace with actual token
+		Token: token, // JWT token generated on login
 	})
 }
