@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"disney/database"
 )
 
 func main() {
-	fmt.Println("Welcome to the Disney Backend Service!")
+	database.InitDB()
 }
