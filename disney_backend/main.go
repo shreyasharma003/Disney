@@ -21,6 +21,7 @@ func main() {
 	{
 		auth.POST("/signup", handlers.Signup)
 		auth.POST("/login", handlers.Login)
+		auth.POST("/create-admin", handlers.CreateAdmin)
 	}
 
 	port := ":8080"
