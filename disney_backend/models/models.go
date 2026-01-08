@@ -4,23 +4,24 @@ import (
 	"time"
 )
 
-//User Table
+// User Table
 type User struct {
 	ID           uint      `gorm:"primaryKey" json:"id"`
 	Name         string    `gorm:"type:varchar(255);not null" json:"name"`
 	Email        string    `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
 	PasswordHash string    `gorm:"type:varchar(255);not null" json:"-"` // excluded from JSON
-	Role         string    `gorm:"type:varchar(50);default:'user';not null" json:"role"` // user/admin
+	Age          int       `gorm:"type:int;not null" json:"age"`
+	Role         string    `gorm:"type:varchar(50);default:'user';not null" json:"role"` // user or admin
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
-//Table naming manually
+// Table naming manually
 func (User) TableName() string {
 	return "users"
 }
 
-//Genre Table
+// Genre Table
 type Genre struct {
 	ID   uint   `gorm:"primaryKey" json:"id"`
 	Name string `gorm:"type:varchar(100);not null;uniqueIndex" json:"name"`
