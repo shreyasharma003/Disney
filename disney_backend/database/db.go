@@ -43,6 +43,15 @@ func InitDB() {
 	DB.AutoMigrate(
 		&models.User{},
 		&models.Genre{},
+		&models.AgeGroup{},
+		&models.Cartoon{},
+		&models.Character{},
+		&models.Rating{},
+		&models.Favourite{},
+		&models.View{},
+		&models.AdminLog{},
+		&models.RequestLog{},
+		&models.TimeTable{},
 	)
 
 	log.Println("Migration done")
