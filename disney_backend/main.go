@@ -3,6 +3,7 @@ package main
 import (
 	"disney/database"
 	"disney/handlers"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -21,5 +22,7 @@ func main() {
 		auth.POST("/login", handlers.Login)
 		auth.POST("/create-admin", handlers.CreateAdmin)
 	}
-
+	port := ":8080"
+	fmt.Println("Server running on port", port)
+	router.Run(port)
 }
