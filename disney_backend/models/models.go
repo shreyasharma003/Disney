@@ -13,6 +13,7 @@ type User struct {
 	Role         string    `gorm:"type:varchar(50);default:'user';not null" json:"role"` // user/admin
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+	Age          int       `gorm:"type:int;not null" json:"age"`
 }
 
 //Table naming manually
