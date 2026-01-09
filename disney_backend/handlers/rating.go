@@ -132,3 +132,32 @@ func UpdateRating(c *gin.Context) {
 		},
 	})
 }
+
+// GetUserRating retrieves user's rating for a specific cartoon
+func GetUserRating(c *gin.Context) {
+	userID := c.GetUint("userID")
+	cartoonID := c.Param("cartoon_id")
+
+	var rating models.Rating
+	result := database.DB.Where("user_id = ? AND cartoon_id = ?", userID, cartoonID).First(&rating)
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "No rating found",
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Rating retrieved successfully",
+		"data": gin.H{
+			"id":         rating.ID,
+			"user_id":    rating.UserID,
+			"cartoon_id": rating.CartoonID,
+			"rating":     rating.Rating,
+			"created_at": rating.CreatedAt,
+		},
+	})
+}
+
