@@ -8,13 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// UpdateRatingRequest represents the request payload to update a rating
+type UpdateRatingRequest struct {
+	Rating int `json:"rating" binding:"required,min=1,max=5"`
+}
+
 // AddRatingRequest represents the request payload to add a rating
 type AddRatingRequest struct {
 	CartoonID uint `json:"cartoon_id" binding:"required"`
 	Rating    int  `json:"rating" binding:"required,min=1,max=5"`
 }
 
-// AddRating adds or updates a rating for a cartoon (User only)
+// AddRating adds a rating for a cartoon (User only)
 func AddRating(c *gin.Context) {
 	userID := c.GetUint("userID")
 
@@ -74,6 +79,56 @@ func AddRating(c *gin.Context) {
 			"cartoon_id": newRating.CartoonID,
 			"rating":     newRating.Rating,
 			"created_at": newRating.CreatedAt,
+		},
+	})
+}
+
+// UpdateRating updates an existing rating for a cartoon (User only)
+func UpdateRating(c *gin.Context) {
+	userID := c.GetUint("userID")
+	cartoonID := c.Param("cartoon_id")
+
+	var req UpdateRatingRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	// Validate rating is between 1-5
+	if req.Rating < 1 || req.Rating > 5 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Rating must be between 1 and 5",
+		})
+		return
+	}
+
+	// Find existing rating
+	var rating models.Rating
+	if result := database.DB.Where("user_id = ? AND cartoon_id = ?", userID, cartoonID).First(&rating); result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Rating not found for this cartoon",
+		})
+		return
+	}
+
+	// Update the rating
+	if err := database.DB.Model(&rating).Update("rating", req.Rating).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to update rating",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Rating updated successfully",
+		"data": gin.H{
+			"id":         rating.ID,
+			"user_id":    rating.UserID,
+			"cartoon_id": rating.CartoonID,
+			"rating":     rating.Rating,
+			"created_at": rating.CreatedAt,
 		},
 	})
 }
