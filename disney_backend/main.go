@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"disney/database"
 	"disney/handlers"
+	"disney/routes"
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -22,6 +24,10 @@ func main() {
 		auth.POST("/login", handlers.Login)
 		auth.POST("/create-admin", handlers.CreateAdmin)
 	}
+
+	// Admin routes (protected)
+	adminGroup := router.Group("/api/admin")
+	routes.SetupAdminRoutes(adminGroup)
 
 	port := ":8080"
 	fmt.Println("Server running on port", port)
