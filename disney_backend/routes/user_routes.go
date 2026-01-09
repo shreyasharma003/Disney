@@ -20,6 +20,7 @@ func UserRoutes(router *gin.Engine) {
 
 		// Rating endpoints
 		user.POST("/ratings", handlers.AddRating)
+		user.GET("/ratings/:cartoon_id", handlers.GetUserRating)
 		user.PUT("/ratings/:cartoon_id", handlers.UpdateRating)
 	}
 }
