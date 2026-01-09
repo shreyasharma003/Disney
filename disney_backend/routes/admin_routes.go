@@ -27,6 +27,7 @@ func SetupAdminRoutes(router *gin.RouterGroup) {
 	admin := router.Group("")
 	admin.Use(middleware.AuthRequired(), middleware.AdminOnly())
 	{
-		// Add admin-only routes here
+		// Create new cartoon with characters
+		admin.POST("/cartoons", handlers.CreateCartoon)
 	}
 }
