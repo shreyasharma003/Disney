@@ -17,5 +17,8 @@ func UserRoutes(router *gin.Engine) {
 		user.POST("/favourites", handlers.AddFavourite)
 		user.GET("/favourites", handlers.GetUserFavourites)
 		user.DELETE("/favourites/:cartoon_id", handlers.RemoveFavourite)
+
+		// Rating endpoints
+		user.POST("/ratings", handlers.AddRating)
 	}
 }
