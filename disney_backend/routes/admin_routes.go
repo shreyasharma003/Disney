@@ -15,6 +15,12 @@ func SetupAdminRoutes(router *gin.RouterGroup) {
 	{
 		// Get all cartoon names
 		authenticated.GET("/cartoons/names", handlers.GetAllCartoonNames)
+		
+		// Get cartoons by filters
+		authenticated.GET("/cartoons/by-character", handlers.GetCartoonsByCharacter)
+		authenticated.GET("/cartoons/by-genre", handlers.GetCartoonsByGenre)
+		authenticated.GET("/cartoons/by-year", handlers.GetCartoonsByYear)
+		authenticated.GET("/cartoons/by-age-group", handlers.GetCartoonsByAgeGroup)
 	}
 
 	// Routes accessible only by admins
