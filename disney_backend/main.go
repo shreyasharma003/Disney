@@ -4,7 +4,8 @@ import (
 	"disney/database"
 	"disney/handlers"
 	"disney/routes"
-	"fmt"      
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -26,6 +27,9 @@ func main() {
 
 	// User routes with middleware
 	routes.UserRoutes(router)
+	// Admin routes (protected)
+	adminGroup := router.Group("/api/admin")
+	routes.SetupAdminRoutes(adminGroup)
 
 	port := ":8080"
 	fmt.Println("Server running on port", port)
