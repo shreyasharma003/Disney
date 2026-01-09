@@ -9,11 +9,18 @@ import (
 
 // SetupAdminRoutes sets up all admin routes
 func SetupAdminRoutes(router *gin.RouterGroup) {
-	// Apply admin authentication middleware
+	// Routes accessible by all authenticated users (both users and admins)
+	authenticated := router.Group("")
+	authenticated.Use(middleware.AuthRequired())
+	{
+		// Get all cartoon names
+		authenticated.GET("/cartoons/names", handlers.GetAllCartoonNames)
+	}
+
+	// Routes accessible only by admins
 	admin := router.Group("")
 	admin.Use(middleware.AuthRequired(), middleware.AdminOnly())
 	{
-		// Get all cartoon names
-		admin.GET("/cartoons/names", handlers.GetAllCartoonNames)
+		// Add admin-only routes here
 	}
 }
