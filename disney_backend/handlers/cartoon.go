@@ -155,3 +155,109 @@ func GetCartoonsByAgeGroup(c *gin.Context) {
 		"count":   len(cartoons),
 	})
 }
+
+// CreateCartoonRequest represents the request to create a new cartoon with characters
+type CreateCartoonRequest struct {
+	Title       string                 `json:"title" binding:"required"`
+	Description string                 `json:"description"`
+	PosterURL   string                 `json:"poster_url"`
+	ReleaseYear int                    `json:"release_year" binding:"required"`
+	GenreID     uint                   `json:"genre_id" binding:"required"`
+	AgeGroupID  uint                   `json:"age_group_id" binding:"required"`
+	IsFeatured  bool                   `json:"is_featured"`
+	Characters  []CreateCharacterRequest `json:"characters"`
+}
+
+// CreateCharacterRequest represents a character in the cartoon
+type CreateCharacterRequest struct {
+	Name     string `json:"name" binding:"required"`
+	ImageURL string `json:"image_url"`
+}
+
+// CreateCartoon creates a new cartoon with its characters
+func CreateCartoon(c *gin.Context) {
+	var req CreateCartoonRequest
+
+	// Validate request
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid request",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Verify genre exists
+	var genre models.Genre
+	if err := database.DB.First(&genre, req.GenreID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid genre ID",
+			"error":   "Genre not found",
+		})
+		return
+	}
+
+	// Verify age group exists
+	var ageGroup models.AgeGroup
+	if err := database.DB.First(&ageGroup, req.AgeGroupID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid age group ID",
+			"error":   "Age group not found",
+		})
+		return
+	}
+
+	// Create cartoon
+	cartoon := models.Cartoon{
+		Title:       req.Title,
+		Description: req.Description,
+		PosterURL:   req.PosterURL,
+		ReleaseYear: req.ReleaseYear,
+		GenreID:     req.GenreID,
+		AgeGroupID:  req.AgeGroupID,
+		IsFeatured:  req.IsFeatured,
+	}
+
+	// Start transaction
+	tx := database.DB.Begin()
+
+	// Create cartoon
+	if err := tx.Create(&cartoon).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to create cartoon",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Create characters if provided
+	if len(req.Characters) > 0 {
+		for _, charReq := range req.Characters {
+			character := models.Character{
+				Name:      charReq.Name,
+				ImageURL:  charReq.ImageURL,
+				CartoonID: cartoon.ID,
+			}
+			if err := tx.Create(&character).Error; err != nil {
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"message": "Failed to create character",
+					"error":   err.Error(),
+				})
+				return
+			}
+		}
+	}
+
+	// Commit transaction
+	tx.Commit()
+
+	// Load relationships for response
+	database.DB.Preload("Genre").Preload("AgeGroup").First(&cartoon, cartoon.ID)
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Cartoon created successfully",
+		"data":    cartoon,
+	})
+}
