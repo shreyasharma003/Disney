@@ -4,8 +4,7 @@ import (
 	"disney/database"
 	"disney/handlers"
 	"disney/routes"
-	"fmt"
-
+	"fmt"      
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
