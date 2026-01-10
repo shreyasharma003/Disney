@@ -4,7 +4,6 @@ import (
 	"disney/database"
 	"disney/models"
 	"disney/services"
-	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -178,14 +177,6 @@ type CartoonDetailResponse struct {
 	AgeGroup    *models.AgeGroup `json:"age_group,omitempty"`
 }
 
-// GetCartoonDetail returns cartoon details with IMDb rating
-func GetCartoonDetail(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 32)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Invalid cartoon ID",
-			"error":   "Cartoon ID must be a valid number",
 // GetCartoonByID retrieves a specific cartoon by its ID and tracks it as recently viewed
 func GetCartoonByID(c *gin.Context) {
 	cartoonID := c.Param("id")
@@ -207,24 +198,6 @@ func GetCartoonByID(c *gin.Context) {
 		return
 	}
 
-	// Fetch IMDb rating from OMDb API
-	imdbRating := services.FetchIMDbRating(cartoon.Title)
-
-	// Build response with IMDb rating
-	response := CartoonDetailResponse{
-		ID:          cartoon.ID,
-		Title:       cartoon.Title,
-		Description: cartoon.Description,
-		PosterURL:   cartoon.PosterURL,
-		ReleaseYear: cartoon.ReleaseYear,
-		GenreID:     cartoon.GenreID,
-		AgeGroupID:  cartoon.AgeGroupID,
-		IsFeatured:  cartoon.IsFeatured,
-		CreatedAt:   cartoon.CreatedAt.String(),
-		UpdatedAt:   cartoon.UpdatedAt.String(),
-		IMDbRating:  imdbRating,
-		Genre:       &cartoon.Genre,
-		AgeGroup:    &cartoon.AgeGroup,
 	// Track the viewed cartoon in recently viewed list
 	userID, exists := c.Get("userID")
 	if exists && userID != nil {
@@ -243,7 +216,7 @@ func GetCartoonByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Cartoon fetched successfully",
-		"data":    response,
+		"data":    cartoon,
 	})
 }
 
@@ -267,7 +240,46 @@ func GetTrendingCartoons(c *gin.Context) {
 	if err := database.DB.Preload("Genre").Preload("AgeGroup").Find(&cartoons).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to fetch cartoons",
-		"data":    cartoon,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Build response with IMDb ratings
+	var trendingList []TrendingCartoonResponse
+	for _, cartoon := range cartoons {
+		imdbRating := services.FetchIMDbRating(cartoon.Title)
+		trendingList = append(trendingList, TrendingCartoonResponse{
+			ID:          cartoon.ID,
+			Title:       cartoon.Title,
+			Description: cartoon.Description,
+			PosterURL:   cartoon.PosterURL,
+			ReleaseYear: cartoon.ReleaseYear,
+			IMDbRating:  imdbRating,
+			Genre:       &cartoon.Genre,
+			AgeGroup:    &cartoon.AgeGroup,
+		})
+	}
+
+	// Sort by IMDb rating (descending)
+	sort.Slice(trendingList, func(i, j int) bool {
+		ratingI, errI := strconv.ParseFloat(trendingList[i].IMDbRating, 64)
+		ratingJ, errJ := strconv.ParseFloat(trendingList[j].IMDbRating, 64)
+		if errI != nil || errJ != nil {
+			return false
+		}
+		return ratingI > ratingJ
+	})
+
+	// Return top 5
+	if len(trendingList) > 5 {
+		trendingList = trendingList[:5]
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Trending cartoons fetched successfully",
+		"data":    trendingList,
+		"count":   len(trendingList),
 	})
 }
 
@@ -302,67 +314,6 @@ func CreateCartoon(c *gin.Context) {
 		return
 	}
 
-	// Fetch IMDb ratings for each cartoon and filter
-	type cartoonWithRating struct {
-		cartoon models.Cartoon
-		rating  float64
-	}
-
-	var cartoonRatings []cartoonWithRating
-
-	for _, cartoon := range cartoons {
-		imdbRating := services.FetchIMDbRating(cartoon.Title)
-
-		// Skip cartoons with N/A rating
-		if imdbRating == "N/A" || imdbRating == "" {
-			continue
-		}
-
-		// Convert string rating to float64 for sorting
-		var ratingFloat float64
-		fmt.Sscanf(imdbRating, "%f", &ratingFloat)
-
-		cartoonRatings = append(cartoonRatings, cartoonWithRating{
-			cartoon: cartoon,
-			rating:  ratingFloat,
-		})
-	}
-
-	// Sort by rating in descending order
-	sort.Slice(cartoonRatings, func(i, j int) bool {
-		return cartoonRatings[i].rating > cartoonRatings[j].rating
-	})
-
-	// Get top 5
-	var topCartoons []TrendingCartoonResponse
-	limit := 5
-	if len(cartoonRatings) < limit {
-		limit = len(cartoonRatings)
-	}
-
-	for i := 0; i < limit; i++ {
-		cr := cartoonRatings[i]
-		// Get the rating string from OMDb API again (could optimize with caching)
-		imdbRating := services.FetchIMDbRating(cr.cartoon.Title)
-
-		topCartoons = append(topCartoons, TrendingCartoonResponse{
-			ID:          cr.cartoon.ID,
-			Title:       cr.cartoon.Title,
-			Description: cr.cartoon.Description,
-			PosterURL:   cr.cartoon.PosterURL,
-			ReleaseYear: cr.cartoon.ReleaseYear,
-			IMDbRating:  imdbRating,
-			Genre:       &cr.cartoon.Genre,
-			AgeGroup:    &cr.cartoon.AgeGroup,
-		})
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Top trending cartoons fetched successfully",
-		"data":    topCartoons,
-		"count":   len(topCartoons),
-	})
-}
 	// Verify genre exists
 	var genre models.Genre
 	if err := database.DB.First(&genre, req.GenreID).Error; err != nil {
