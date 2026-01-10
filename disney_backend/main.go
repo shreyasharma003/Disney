@@ -4,6 +4,7 @@ import (
 	"disney/database"
 	"disney/handlers"
 	"disney/routes"
+	"disney/workers"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,18 @@ import (
 func main() {
 	godotenv.Load()
 	database.InitDB()
+
+	// Initialize and start view worker pool
+	// 5 concurrent workers, buffer size of 100 jobs
+	viewWorkerPool := workers.NewViewWorkerPool(5, 100)
+	viewWorkerPool.Start()
+	handlers.ViewWorkerPoolInstance = viewWorkerPool
+
+	// Initialize and start favourite worker pool
+	// 5 concurrent workers, buffer size of 100 jobs
+	favouriteWorkerPool := workers.NewFavouriteWorkerPool(5, 100)
+	favouriteWorkerPool.Start()
+	handlers.FavouriteWorkerPoolInstance = favouriteWorkerPool
 
 	// Create Gin router
 	router := gin.Default()
@@ -33,6 +46,8 @@ func main() {
 
 	port := ":8080"
 	fmt.Println("Server running on port", port)
+	fmt.Println("View worker pool: 5 workers, buffer: 100")
+	fmt.Println("Favourite worker pool: 5 workers, buffer: 100")
 	router.Run(port)
 
 }

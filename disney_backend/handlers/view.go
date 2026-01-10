@@ -3,8 +3,8 @@ package handlers
 import (
 	"disney/database"
 	"disney/models"
+	"disney/workers"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +14,13 @@ type RecordViewRequest struct {
 	CartoonID uint `json:"cartoon_id" binding:"required"`
 }
 
-// RecordView records a view for a cartoon (authenticated users only)
+// ViewWorkerPoolInstance is the global instance of the view worker pool
+// Initialized in main.go and used by handlers
+var ViewWorkerPoolInstance *workers.ViewWorkerPool
+
+// RecordView records a view for a cartoon using the worker pool (authenticated users only)
+// This handler queues the view job and returns immediately without waiting for database write
+// The actual view recording happens asynchronously in background workers
 func RecordView(c *gin.Context) {
 	userID := c.GetUint("userID")
 
@@ -26,7 +32,7 @@ func RecordView(c *gin.Context) {
 		return
 	}
 
-	// Check if cartoon exists
+	// Check if cartoon exists (validation query)
 	var cartoon models.Cartoon
 	if result := database.DB.First(&cartoon, req.CartoonID); result.RowsAffected == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -35,29 +41,22 @@ func RecordView(c *gin.Context) {
 		return
 	}
 
-	// Record view
-	newView := models.View{
-		CartoonID: req.CartoonID,
-		UserID:    &userID,
-		ViewedAt:  time.Now(),
-	}
+	// Enqueue view job to worker pool for async processing
+	// This returns immediately without blocking the HTTP request
+	ViewWorkerPoolInstance.EnqueueViewJob(userID, req.CartoonID)
 
-	if err := database.DB.Create(&newView).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to record view",
-		})
-		return
-	}
-
-	// Get total view count for this cartoon
+	// Get current view count for response (might not include the just-enqueued view)
 	var viewCount int64
 	database.DB.Model(&models.View{}).Where("cartoon_id = ?", req.CartoonID).Count(&viewCount)
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message":     "View recorded successfully",
-		"view_id":     newView.ID,
-		"cartoon_id":  req.CartoonID,
-		"total_views": viewCount,
+	// Return immediate response to client
+	// Note: viewCount may not include the enqueued view yet due to async processing
+	c.JSON(http.StatusAccepted, gin.H{
+		"message":         "View recording queued successfully",
+		"cartoon_id":      req.CartoonID,
+		"current_views":   viewCount,
+		"queue_length":    ViewWorkerPoolInstance.GetQueueLength(),
+		"processing_note": "View is being processed asynchronously",
 	})
 }
 
