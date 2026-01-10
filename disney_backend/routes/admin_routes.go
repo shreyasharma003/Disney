@@ -29,5 +29,11 @@ func SetupAdminRoutes(router *gin.RouterGroup) {
 	{
 		// Create new cartoon with characters
 		admin.POST("/cartoons", handlers.CreateCartoon)
+		
+		// Update cartoon by ID
+		admin.PUT("/cartoons/:id", handlers.UpdateCartoon)
+		
+		// Delete cartoon by ID or title
+		admin.DELETE("/cartoons", handlers.DeleteCartoon)
 	}
 }
