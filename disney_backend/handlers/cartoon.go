@@ -261,3 +261,53 @@ func CreateCartoon(c *gin.Context) {
 		"data":    cartoon,
 	})
 }
+
+// DeleteCartoon deletes a cartoon by ID or title
+func DeleteCartoon(c *gin.Context) {
+	cartoonID := c.Query("id")
+	cartoonTitle := c.Query("title")
+
+	if cartoonID == "" && cartoonTitle == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Cartoon ID or title is required",
+			"error":   "Please provide 'id' or 'title' query parameter",
+		})
+		return
+	}
+
+	var cartoon models.Cartoon
+	var query = database.DB
+
+	// Search by ID or title
+	if cartoonID != "" {
+		query = query.Where("id = ?", cartoonID)
+	} else {
+		query = query.Where("title ILIKE ?", "%"+cartoonTitle+"%")
+	}
+
+	// Find cartoon
+	if err := query.First(&cartoon).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "Cartoon not found",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Delete cartoon (characters will be deleted automatically due to CASCADE)
+	if err := database.DB.Delete(&cartoon).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to delete cartoon",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Cartoon deleted successfully",
+		"data": gin.H{
+			"id":    cartoon.ID,
+			"title": cartoon.Title,
+		},
+	})
+}
