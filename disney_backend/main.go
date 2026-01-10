@@ -1,10 +1,11 @@
 package main
 
 import (
-	"disney/config"
 	"disney/database"
 	"disney/handlers"
 	"disney/routes"
+	"disney/workers"
+	"disney/config"
 	"disney/services"
 	"fmt"
 
@@ -25,6 +26,18 @@ func main() {
 	// Set Redis client in services
 	services.SetRedisClient(config.RedisClient)
 
+	// Initialize and start view worker pool
+	// 5 concurrent workers, buffer size of 100 jobs
+	viewWorkerPool := workers.NewViewWorkerPool(5, 100)
+	viewWorkerPool.Start()
+	handlers.ViewWorkerPoolInstance = viewWorkerPool
+
+	// Initialize and start favourite worker pool
+	// 5 concurrent workers, buffer size of 100 jobs
+	favouriteWorkerPool := workers.NewFavouriteWorkerPool(5, 100)
+	favouriteWorkerPool.Start()
+	handlers.FavouriteWorkerPoolInstance = favouriteWorkerPool
+
 	// Create Gin router
 	router := gin.Default()
 
@@ -36,12 +49,16 @@ func main() {
 		auth.POST("/create-admin", handlers.CreateAdmin)
 	}
 
+	// User routes with middleware
+	routes.UserRoutes(router)
 	// Admin routes (protected)
 	adminGroup := router.Group("/api/admin")
 	routes.SetupAdminRoutes(adminGroup)
 
 	port := ":8080"
 	fmt.Println("Server running on port", port)
+	fmt.Println("View worker pool: 5 workers, buffer: 100")
+	fmt.Println("Favourite worker pool: 5 workers, buffer: 100")
 	router.Run(port)
 
 }
