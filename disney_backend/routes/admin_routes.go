@@ -13,9 +13,15 @@ func SetupAdminRoutes(router *gin.RouterGroup) {
 	authenticated := router.Group("")
 	authenticated.Use(middleware.AuthRequired())
 	{
+		// Get cartoon details with IMDb rating
+		authenticated.GET("/cartoons/:id", handlers.GetCartoonDetail)
+
+		// Get top 5 trending cartoons by IMDb rating
+		authenticated.GET("/cartoons/trending", handlers.GetTrendingCartoons)
+
 		// Get all cartoon names
 		authenticated.GET("/cartoons/names", handlers.GetAllCartoonNames)
-		
+
 		// Get cartoons by filters
 		authenticated.GET("/cartoons/by-character", handlers.GetCartoonsByCharacter)
 		authenticated.GET("/cartoons/by-genre", handlers.GetCartoonsByGenre)
@@ -27,6 +33,6 @@ func SetupAdminRoutes(router *gin.RouterGroup) {
 	admin := router.Group("")
 	admin.Use(middleware.AuthRequired(), middleware.AdminOnly())
 	{
-		
+
 	}
 }
