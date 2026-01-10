@@ -63,6 +63,7 @@ func GetCartoonsByCharacter(c *gin.Context) {
 		})
 		return
 	}
+	
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Cartoons fetched successfully",
@@ -185,12 +186,20 @@ func GetCartoonDetail(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid cartoon ID",
 			"error":   "Cartoon ID must be a valid number",
+// GetCartoonByID retrieves a specific cartoon by its ID and tracks it as recently viewed
+func GetCartoonByID(c *gin.Context) {
+	cartoonID := c.Param("id")
+	if cartoonID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Cartoon ID is required",
+			"error":   "Please provide cartoon ID in the URL",
 		})
 		return
 	}
 
 	var cartoon models.Cartoon
-	if err := database.DB.Preload("Genre").Preload("AgeGroup").First(&cartoon, id).Error; err != nil {
+	if err := database.DB.Preload("Genre").Preload("AgeGroup").
+		First(&cartoon, cartoonID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message": "Cartoon not found",
 			"error":   err.Error(),
@@ -216,6 +225,20 @@ func GetCartoonDetail(c *gin.Context) {
 		IMDbRating:  imdbRating,
 		Genre:       &cartoon.Genre,
 		AgeGroup:    &cartoon.AgeGroup,
+	// Track the viewed cartoon in recently viewed list
+	userID, exists := c.Get("userID")
+	if exists && userID != nil {
+		// userID from context is uint, convert to int
+		uid := int(userID.(uint))
+		cid := int(cartoon.ID)
+		
+		// Add to recently viewed cache (async - don't block response if Redis fails)
+		go func() {
+			if err := services.AddRecentlyViewed(uid, cid); err != nil {
+				// Log error but don't fail the request
+				// You can implement proper logging here
+			}
+		}()
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -244,6 +267,36 @@ func GetTrendingCartoons(c *gin.Context) {
 	if err := database.DB.Preload("Genre").Preload("AgeGroup").Find(&cartoons).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to fetch cartoons",
+		"data":    cartoon,
+	})
+}
+
+// CreateCartoonRequest represents the request to create a new cartoon with characters
+type CreateCartoonRequest struct {
+	Title       string                 `json:"title" binding:"required"`
+	Description string                 `json:"description"`
+	PosterURL   string                 `json:"poster_url"`
+	ReleaseYear int                    `json:"release_year" binding:"required"`
+	GenreID     uint                   `json:"genre_id" binding:"required"`
+	AgeGroupID  uint                   `json:"age_group_id" binding:"required"`
+	IsFeatured  bool                   `json:"is_featured"`
+	Characters  []CreateCharacterRequest `json:"characters"`
+}
+
+// CreateCharacterRequest represents a character in the cartoon
+type CreateCharacterRequest struct {
+	Name     string `json:"name" binding:"required"`
+	ImageURL string `json:"image_url"`
+}
+
+// CreateCartoon creates a new cartoon with its characters
+func CreateCartoon(c *gin.Context) {
+	var req CreateCartoonRequest
+
+	// Validate request
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid request",
 			"error":   err.Error(),
 		})
 		return
@@ -308,5 +361,204 @@ func GetTrendingCartoons(c *gin.Context) {
 		"message": "Top trending cartoons fetched successfully",
 		"data":    topCartoons,
 		"count":   len(topCartoons),
+	})
+}
+	// Verify genre exists
+	var genre models.Genre
+	if err := database.DB.First(&genre, req.GenreID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid genre ID",
+			"error":   "Genre not found",
+		})
+		return
+	}
+
+	// Verify age group exists
+	var ageGroup models.AgeGroup
+	if err := database.DB.First(&ageGroup, req.AgeGroupID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid age group ID",
+			"error":   "Age group not found",
+		})
+		return
+	}
+
+	// Create cartoon
+	cartoon := models.Cartoon{
+		Title:       req.Title,
+		Description: req.Description,
+		PosterURL:   req.PosterURL,
+		ReleaseYear: req.ReleaseYear,
+		GenreID:     req.GenreID,
+		AgeGroupID:  req.AgeGroupID,
+		IsFeatured:  req.IsFeatured,
+	}
+
+	// Start transaction
+	tx := database.DB.Begin()
+
+	// Create cartoon
+	if err := tx.Create(&cartoon).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to create cartoon",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Create characters if provided
+	if len(req.Characters) > 0 {
+		for _, charReq := range req.Characters {
+			character := models.Character{
+				Name:      charReq.Name,
+				ImageURL:  charReq.ImageURL,
+				CartoonID: cartoon.ID,
+			}
+			if err := tx.Create(&character).Error; err != nil {
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"message": "Failed to create character",
+					"error":   err.Error(),
+				})
+				return
+			}
+		}
+	}
+
+	// Commit transaction
+	tx.Commit()
+
+	// Load relationships for response
+	database.DB.Preload("Genre").Preload("AgeGroup").First(&cartoon, cartoon.ID)
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Cartoon created successfully",
+		"data":    cartoon,
+	})
+}
+
+// DeleteCartoon deletes a cartoon by ID or title
+func DeleteCartoon(c *gin.Context) {
+	cartoonID := c.Query("id")
+	cartoonTitle := c.Query("title")
+
+	if cartoonID == "" && cartoonTitle == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Cartoon ID or title is required",
+			"error":   "Please provide 'id' or 'title' query parameter",
+		})
+		return
+	}
+
+	var cartoon models.Cartoon
+	var query = database.DB
+
+	// Search by ID or title
+	if cartoonID != "" {
+		query = query.Where("id = ?", cartoonID)
+	} else {
+		query = query.Where("title ILIKE ?", "%"+cartoonTitle+"%")
+	}
+
+	// Find cartoon
+	if err := query.First(&cartoon).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "Cartoon not found",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Delete cartoon (characters will be deleted automatically due to CASCADE)
+	if err := database.DB.Delete(&cartoon).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to delete cartoon",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Cartoon deleted successfully",
+		"data": gin.H{
+			"id":    cartoon.ID,
+			"title": cartoon.Title,
+		},
+	})
+}
+
+// GetRecentlyViewedRequest is the response structure for recently viewed cartoons
+type GetRecentlyViewedResponse struct {
+	CartoonID   uint        `json:"cartoon_id"`
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	PosterURL   string      `json:"poster_url"`
+	ReleaseYear int         `json:"release_year"`
+	Genre       models.Genre      `json:"genre,omitempty"`
+	AgeGroup    models.AgeGroup   `json:"age_group,omitempty"`
+}
+
+// GetRecentlyViewed fetches the recently viewed cartoons for the authenticated user
+func GetRecentlyViewed(c *gin.Context) {
+	// Get user ID from context (set by AuthRequired middleware)
+	userIDInterface, exists := c.Get("userID")
+	if !exists || userIDInterface == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "User not authenticated",
+			"error":   "User ID not found in context",
+		})
+		return
+	}
+
+	// Convert uint to int
+	userID := int(userIDInterface.(uint))
+
+	// Get cartoon IDs from Redis
+	cartoonIDs, err := services.GetRecentlyViewed(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to fetch recently viewed cartoons",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// If no recently viewed cartoons, return empty list
+	if len(cartoonIDs) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "No recently viewed cartoons",
+			"data":    []GetRecentlyViewedResponse{},
+			"count":   0,
+		})
+		return
+	}
+
+	// Fetch full cartoon details from database in the order they appear in Redis
+	var response []GetRecentlyViewedResponse
+
+	for _, cartoonID := range cartoonIDs {
+		var cartoon models.Cartoon
+		if err := database.DB.Preload("Genre").Preload("AgeGroup").
+			First(&cartoon, cartoonID).Error; err != nil {
+			// Skip if cartoon not found, continue with others
+			continue
+		}
+
+		response = append(response, GetRecentlyViewedResponse{
+			CartoonID:   cartoon.ID,
+			Title:       cartoon.Title,
+			Description: cartoon.Description,
+			PosterURL:   cartoon.PosterURL,
+			ReleaseYear: cartoon.ReleaseYear,
+			Genre:       cartoon.Genre,
+			AgeGroup:    cartoon.AgeGroup,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Recently viewed cartoons fetched successfully",
+		"data":    response,
+		"count":   len(response),
 	})
 }

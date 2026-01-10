@@ -5,6 +5,8 @@ import (
 	"disney/handlers"
 	"disney/routes"
 	"disney/workers"
+	"disney/config"
+	"disney/services"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +15,16 @@ import (
 
 func main() {
 	godotenv.Load()
+	
+	// Initialize database
 	database.InitDB()
+	
+	// Initialize Redis
+	config.InitRedis()
+	defer config.CloseRedis()
+	
+	// Set Redis client in services
+	services.SetRedisClient(config.RedisClient)
 
 	// Initialize and start view worker pool
 	// 5 concurrent workers, buffer size of 100 jobs

@@ -27,12 +27,25 @@ func SetupAdminRoutes(router *gin.RouterGroup) {
 		authenticated.GET("/cartoons/by-genre", handlers.GetCartoonsByGenre)
 		authenticated.GET("/cartoons/by-year", handlers.GetCartoonsByYear)
 		authenticated.GET("/cartoons/by-age-group", handlers.GetCartoonsByAgeGroup)
+
+		// Get specific cartoon by ID (tracks as recently viewed)
+		authenticated.GET("/cartoons/:id", handlers.GetCartoonByID)
+
+		// Get recently viewed cartoons
+		authenticated.GET("/recently-viewed", handlers.GetRecentlyViewed)
 	}
 
 	// Routes accessible only by admins
 	admin := router.Group("")
 	admin.Use(middleware.AuthRequired(), middleware.AdminOnly())
 	{
-
+		// Create new cartoon with characters
+		admin.POST("/cartoons", handlers.CreateCartoon)
+		
+		// Update cartoon by ID
+		admin.PUT("/cartoons/:id", handlers.UpdateCartoon)
+		
+		// Delete cartoon by ID or title
+		admin.DELETE("/cartoons", handlers.DeleteCartoon)
 	}
 }
