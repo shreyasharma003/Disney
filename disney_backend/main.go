@@ -1,9 +1,11 @@
 package main
 
 import (
+	"disney/config"
 	"disney/database"
 	"disney/handlers"
 	"disney/routes"
+	"disney/services"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +14,16 @@ import (
 
 func main() {
 	godotenv.Load()
+	
+	// Initialize database
 	database.InitDB()
+	
+	// Initialize Redis
+	config.InitRedis()
+	defer config.CloseRedis()
+	
+	// Set Redis client in services
+	services.SetRedisClient(config.RedisClient)
 
 	// Create Gin router
 	router := gin.Default()

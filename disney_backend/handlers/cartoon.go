@@ -3,6 +3,7 @@ package handlers
 import (
 	"disney/database"
 	"disney/models"
+	"disney/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -59,6 +60,7 @@ func GetCartoonsByCharacter(c *gin.Context) {
 		})
 		return
 	}
+	
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Cartoons fetched successfully",
@@ -153,6 +155,49 @@ func GetCartoonsByAgeGroup(c *gin.Context) {
 		"message": "Cartoons fetched successfully",
 		"data":    cartoons,
 		"count":   len(cartoons),
+	})
+}
+
+// GetCartoonByID retrieves a specific cartoon by its ID and tracks it as recently viewed
+func GetCartoonByID(c *gin.Context) {
+	cartoonID := c.Param("id")
+	if cartoonID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Cartoon ID is required",
+			"error":   "Please provide cartoon ID in the URL",
+		})
+		return
+	}
+
+	var cartoon models.Cartoon
+	if err := database.DB.Preload("Genre").Preload("AgeGroup").
+		First(&cartoon, cartoonID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "Cartoon not found",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Track the viewed cartoon in recently viewed list
+	userID, exists := c.Get("userID")
+	if exists && userID != nil {
+		// userID from context is uint, convert to int
+		uid := int(userID.(uint))
+		cid := int(cartoon.ID)
+		
+		// Add to recently viewed cache (async - don't block response if Redis fails)
+		go func() {
+			if err := services.AddRecentlyViewed(uid, cid); err != nil {
+				// Log error but don't fail the request
+				// You can implement proper logging here
+			}
+		}()
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Cartoon fetched successfully",
+		"data":    cartoon,
 	})
 }
 
@@ -309,5 +354,80 @@ func DeleteCartoon(c *gin.Context) {
 			"id":    cartoon.ID,
 			"title": cartoon.Title,
 		},
+	})
+}
+
+// GetRecentlyViewedRequest is the response structure for recently viewed cartoons
+type GetRecentlyViewedResponse struct {
+	CartoonID   uint        `json:"cartoon_id"`
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	PosterURL   string      `json:"poster_url"`
+	ReleaseYear int         `json:"release_year"`
+	Genre       models.Genre      `json:"genre,omitempty"`
+	AgeGroup    models.AgeGroup   `json:"age_group,omitempty"`
+}
+
+// GetRecentlyViewed fetches the recently viewed cartoons for the authenticated user
+func GetRecentlyViewed(c *gin.Context) {
+	// Get user ID from context (set by AuthRequired middleware)
+	userIDInterface, exists := c.Get("userID")
+	if !exists || userIDInterface == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "User not authenticated",
+			"error":   "User ID not found in context",
+		})
+		return
+	}
+
+	// Convert uint to int
+	userID := int(userIDInterface.(uint))
+
+	// Get cartoon IDs from Redis
+	cartoonIDs, err := services.GetRecentlyViewed(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to fetch recently viewed cartoons",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// If no recently viewed cartoons, return empty list
+	if len(cartoonIDs) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "No recently viewed cartoons",
+			"data":    []GetRecentlyViewedResponse{},
+			"count":   0,
+		})
+		return
+	}
+
+	// Fetch full cartoon details from database in the order they appear in Redis
+	var response []GetRecentlyViewedResponse
+
+	for _, cartoonID := range cartoonIDs {
+		var cartoon models.Cartoon
+		if err := database.DB.Preload("Genre").Preload("AgeGroup").
+			First(&cartoon, cartoonID).Error; err != nil {
+			// Skip if cartoon not found, continue with others
+			continue
+		}
+
+		response = append(response, GetRecentlyViewedResponse{
+			CartoonID:   cartoon.ID,
+			Title:       cartoon.Title,
+			Description: cartoon.Description,
+			PosterURL:   cartoon.PosterURL,
+			ReleaseYear: cartoon.ReleaseYear,
+			Genre:       cartoon.Genre,
+			AgeGroup:    cartoon.AgeGroup,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Recently viewed cartoons fetched successfully",
+		"data":    response,
+		"count":   len(response),
 	})
 }

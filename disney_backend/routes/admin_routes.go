@@ -21,6 +21,12 @@ func SetupAdminRoutes(router *gin.RouterGroup) {
 		authenticated.GET("/cartoons/by-genre", handlers.GetCartoonsByGenre)
 		authenticated.GET("/cartoons/by-year", handlers.GetCartoonsByYear)
 		authenticated.GET("/cartoons/by-age-group", handlers.GetCartoonsByAgeGroup)
+
+		// Get specific cartoon by ID (tracks as recently viewed)
+		authenticated.GET("/cartoons/:id", handlers.GetCartoonByID)
+
+		// Get recently viewed cartoons
+		authenticated.GET("/recently-viewed", handlers.GetRecentlyViewed)
 	}
 
 	// Routes accessible only by admins
