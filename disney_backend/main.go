@@ -8,6 +8,7 @@ import (
 	"disney/services"
 	"fmt"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -27,6 +28,13 @@ func main() {
 
 	// Create Gin router
 	router := gin.Default()
+
+	// Configure CORS - Allow all origins for development
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept"}
+	router.Use(cors.New(config))
 
 	// Public Auth routes (no authentication required)
 	auth := router.Group("/api/auth")
