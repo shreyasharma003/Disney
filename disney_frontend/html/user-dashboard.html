@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Disney Cartoons</title>
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/user-dashboard.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="dashboard-header">
+      <button class="logout-btn" onclick="handleLogout()">
+        <span>🚪</span> Logout
+      </button>
+
+      <h1 class="disney-logo">Disney</h1>
+
+      <div class="header-right">
+        <span class="welcome-msg" id="welcomeMsg">Welcome, User</span>
+        <button
+          class="theme-toggle"
+          onclick="toggleTheme()"
+          aria-label="Toggle theme"
+        >
+          <span id="theme-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="search-container">
+        <div class="search-bar-wrapper">
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search by cartoon or character name..."
+          />
+          <button
+            class="clear-search"
+            id="clearSearchBtn"
+            style="display: none"
+          >
+            ✕
+          </button>
+        </div>
+
+        <select id="genreFilter" class="filter-dropdown">
+          <option value="">All Genres</option>
+        </select>
+
+        <select id="yearFilter" class="filter-dropdown">
+          <option value="">All Years</option>
+          <option value="2020-2024">2020-2024</option>
+          <option value="2015-2019">2015-2019</option>
+          <option value="2010-2014">2010-2014</option>
+          <option value="2000-2009">2000-2009</option>
+          <option value="1990-1999">1990-1999</option>
+          <option value="before-1990">Before 1990</option>
+        </select>
+      </div>
+
+      <!-- Search Results -->
+      <div
+        id="searchResults"
+        class="search-results"
+        style="display: none"
+      ></div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+      <!-- Trending Section -->
+      <section class="content-section">
+        <h2 class="section-title">Trending Now 🔥</h2>
+        <div class="cards-container horizontal-scroll" id="trendingContainer">
+          <!-- Loading skeleton -->
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </section>
+
+      <!-- Favourites Section -->
+      <section class="content-section">
+        <h2 class="section-title">Your Favourites ❤️</h2>
+        <div class="cards-container horizontal-scroll" id="favoritesContainer">
+          <!-- Loading skeleton -->
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </section>
+
+      <!-- Recently Viewed Section -->
+      <section class="content-section">
+        <h2 class="section-title">Continue Watching 👀</h2>
+        <div
+          class="cards-container horizontal-scroll"
+          id="recentlyViewedContainer"
+        >
+          <!-- Loading skeleton -->
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Background Cutouts Container -->
+    <div class="cutouts-container" id="cutoutsContainer">
+      <!-- Cutouts will be added here dynamically -->
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/user-dashboard.js"></script>
+  </body>
+</html>
