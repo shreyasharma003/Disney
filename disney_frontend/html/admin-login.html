@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - Disney Cartoons</title>
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/auth.css" />
+  </head>
+  <body>
+    <!-- Theme Toggle -->
+    <button
+      class="theme-toggle"
+      onclick="toggleTheme()"
+      aria-label="Toggle theme"
+    >
+      <span id="theme-icon">🌙</span>
+    </button>
+
+    <div class="auth-container">
+      <div class="auth-card admin-card">
+        <h1 class="auth-title">Admin Portal 🛡️</h1>
+        <p class="auth-subtitle">Login to manage content</p>
+
+        <form id="loginForm" class="auth-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
+          <div id="errorMessage" class="error-message"></div>
+          <div id="successMessage" class="success-message"></div>
+
+          <button type="submit" class="btn-primary" id="submitBtn">
+            Login
+          </button>
+        </form>
+
+        <p class="auth-footer">
+          Need an admin account?
+          <a href="admin-signup.html" class="auth-link">Register</a>
+        </p>
+
+        <p class="auth-footer">
+          <a href="index.html" class="auth-link">← Back to Home</a>
+        </p>
+      </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-login.js"></script>
+  </body>
+</html>
