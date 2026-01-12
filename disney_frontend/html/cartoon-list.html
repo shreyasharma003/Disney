@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Cartoons - Disney</title>
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/cartoon-list.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="page-header">
+      <button class="back-btn" onclick="goBack()">
+        <span>←</span> Back to Dashboard
+      </button>
+
+      <h1 class="disney-logo">Disney</h1>
+
+      <div class="header-right">
+        <span class="welcome-msg" id="welcomeMsg">Welcome, User</span>
+        <button
+          class="theme-toggle"
+          onclick="toggleTheme()"
+          aria-label="Toggle theme"
+        >
+          <span id="theme-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="search-container">
+        <div class="search-bar-wrapper">
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search by cartoon or character name..."
+          />
+          <button
+            class="clear-search"
+            id="clearSearchBtn"
+            style="display: none"
+          >
+            ✕
+          </button>
+        </div>
+
+        <select id="genreFilter" class="filter-dropdown">
+          <option value="">All Genres</option>
+          <option value="1">Action</option>
+          <option value="2">Comedy</option>
+          <option value="3">Drama</option>
+          <option value="4">Romance</option>
+          <option value="5">Thriller</option>
+          <option value="6">Horror</option>
+          <option value="7">Sci-Fi</option>
+          <option value="8">Fantasy</option>
+        </select>
+
+        <select id="yearFilter" class="filter-dropdown">
+          <option value="">All Years</option>
+          <option value="2020-2024">2020-2024</option>
+          <option value="2015-2019">2015-2019</option>
+          <option value="2010-2014">2010-2014</option>
+          <option value="2000-2009">2000-2009</option>
+          <option value="1990-1999">1990-1999</option>
+          <option value="before-1990">Before 1990</option>
+        </select>
+
+        <button
+          class="clear-filters-btn"
+          id="clearFiltersBtn"
+          onclick="clearAllFilters()"
+        >
+          Clear Filters
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="page-content">
+      <div class="content-header">
+        <h2 class="section-title" id="resultTitle">All Disney Cartoons</h2>
+        <div class="result-count" id="resultCount"></div>
+      </div>
+
+      <!-- Cartoons Grid -->
+      <div class="cartoons-grid" id="cartoonsGrid">
+        <!-- Loading skeleton -->
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination" style="display: none">
+        <button class="pagination-btn" id="prevBtn" onclick="previousPage()">
+          ← Previous
+        </button>
+        <div class="pagination-info">
+          <span id="pageInfo">Page 1 of 1</span>
+        </div>
+        <button class="pagination-btn" id="nextBtn" onclick="nextPage()">
+          Next →
+        </button>
+      </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/cartoon-list.js"></script>
+  </body>
+</html>

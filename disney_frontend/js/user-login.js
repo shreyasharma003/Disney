@@ -77,6 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Redirect to homepage after 1 second
         setTimeout(() => {
           window.location.href = "index.html";
+        // Redirect to user dashboard after 1 second
+        setTimeout(() => {
+          window.location.href = "user-dashboard.html";
         }, 1000);
       } else {
         // Error from server

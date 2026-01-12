@@ -57,8 +57,8 @@ type Cartoon struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 
 	// Foreign key relationships
-	Genre      Genre       `gorm:"foreignKey:GenreID;constraint:OnDelete:RESTRICT" json:"genre,omitempty"`
-	AgeGroup   AgeGroup    `gorm:"foreignKey:AgeGroupID;constraint:OnDelete:RESTRICT" json:"age_group,omitempty"`
+	Genre    Genre    `gorm:"foreignKey:GenreID;constraint:OnDelete:RESTRICT" json:"genre,omitempty"`
+	AgeGroup AgeGroup `gorm:"foreignKey:AgeGroupID;constraint:OnDelete:RESTRICT" json:"age_group,omitempty"`
 	Characters []Character `gorm:"foreignKey:CartoonID;constraint:OnDelete:CASCADE" json:"characters,omitempty"`
 }
 

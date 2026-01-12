@@ -1,0 +1,642 @@
+/* User Dashboard Styles */
+
+/* ============================================
+   THEME VARIABLES
+   ============================================ */
+
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --card-bg: rgba(255, 255, 255, 0.1);
+  --card-border: rgba(255, 255, 255, 0.15);
+  --hover-bg: rgba(255, 255, 255, 0.15);
+  --shadow: rgba(0, 0, 0, 0.5);
+  --cutout-opacity: 0.3;
+}
+
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --card-bg: rgba(0, 0, 0, 0.05);
+  --card-border: rgba(0, 0, 0, 0.1);
+  --hover-bg: rgba(0, 0, 0, 0.08);
+  --shadow: rgba(0, 0, 0, 0.1);
+  --cutout-opacity: 0.2;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 48px;
+  background: var(--bg-secondary);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.logout-btn {
+  padding: 10px 20px;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 8px;
+  color: #ff6b6b;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 107, 107, 0.2);
+  transform: translateY(-2px);
+}
+
+.disney-logo {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.welcome-msg {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* Override common.css fixed positioning for dashboard theme toggle */
+.dashboard-header .theme-toggle {
+  position: relative;
+  top: auto;
+  right: auto;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.dashboard-header .theme-toggle:hover {
+  background: var(--hover-bg);
+  transform: scale(1.05);
+}
+
+.dashboard-header .theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   SEARCH SECTION
+   ============================================ */
+
+.search-section {
+  padding: 32px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.search-container {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.search-bar-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 48px 14px 20px;
+  border: 2px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  color: var(--text-primary);
+  font-size: 15px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.clear-search {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: all 0.3s ease;
+}
+
+.clear-search:hover {
+  color: var(--text-primary);
+}
+
+.filter-dropdown {
+  padding: 14px 16px;
+  border: 2px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  min-width: 150px;
+}
+
+.filter-dropdown option {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 10px;
+}
+
+.filter-dropdown:focus {
+  border-color: #667eea;
+}
+
+/* Search Results */
+.search-results {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+
+.dashboard-content {
+  padding: 0 48px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.content-section {
+  margin-bottom: 56px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+}
+
+/* ============================================
+   BROWSE ALL CARTOONS SECTION
+   ============================================ */
+
+.browse-section {
+  margin-bottom: 48px;
+}
+
+.browse-banner {
+  background: #000000;
+  border-radius: 20px;
+  padding: 48px 56px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.browse-banner::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.browse-content {
+  position: relative;
+  z-index: 1;
+}
+
+.browse-title {
+  font-size: 36px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.browse-description {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 28px;
+  max-width: 600px;
+}
+
+.browse-btn {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.browse-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  background: #f8f9ff;
+}
+
+.browse-btn .arrow {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.browse-btn:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* Light mode specific styles for browse banner */
+[data-theme="light"] .browse-banner {
+  background: #ffffff;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .browse-title {
+  color: #000000;
+}
+
+[data-theme="light"] .browse-description {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="light"] .browse-btn {
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .browse-btn:hover {
+  background: #1a1a1a;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.horizontal-scroll {
+  overflow: visible;
+  padding-bottom: 16px;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+  background: var(--card-bg);
+  border-radius: 3px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 3px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--hover-bg);
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+
+.cartoon-card {
+  width: 100%;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.cartoon-card:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 12px 32px var(--shadow);
+  border-color: #667eea;
+}
+
+.card-poster {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.cartoon-card:hover .card-poster {
+  filter: brightness(1.1);
+}
+
+.card-content {
+  padding: 10px;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-meta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.favorite-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  z-index: 10;
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 1);
+  opacity: 0.9;
+}
+
+.favorite-btn.active {
+  background: rgba(255, 255, 255, 0.95);
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.favorite-btn.active:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.2);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+/* ============================================
+   SKELETON LOADER
+   ============================================ */
+
+.skeleton-card {
+  min-width: 200px;
+  width: 200px;
+  height: 360px;
+  background: linear-gradient(
+    90deg,
+    var(--card-bg) 0%,
+    var(--hover-bg) 50%,
+    var(--card-bg) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ============================================
+   TOAST NOTIFICATION
+   ============================================ */
+
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  padding: 16px 24px;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(20px);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast.success {
+  background: rgba(38, 222, 129, 0.9);
+}
+
+.toast.error {
+  background: rgba(255, 107, 107, 0.9);
+}
+
+/* ============================================
+   BACKGROUND CUTOUTS
+   ============================================ */
+
+.cutouts-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.cutout {
+  position: absolute;
+  opacity: var(--cutout-opacity);
+  transition: opacity 0.3s ease;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 16px 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .disney-logo {
+    font-size: 32px;
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+
+  .header-right {
+    gap: 20px;
+  }
+
+  .welcome-msg {
+    font-size: 14px;
+  }
+
+  .search-section {
+    padding: 24px 24px;
+  }
+
+  .search-container {
+    flex-direction: column;
+  }
+
+  .filter-dropdown {
+    width: 100%;
+  }
+
+  .dashboard-content {
+    padding: 0 24px 24px;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+
+  .cartoon-card {
+    width: 100%;
+  }
+
+  .cards-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .search-results {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+}

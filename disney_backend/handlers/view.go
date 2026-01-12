@@ -3,7 +3,9 @@ package handlers
 import (
 	"disney/database"
 	"disney/models"
+	"disney/services"
 	"disney/workers"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,22 +43,25 @@ func RecordView(c *gin.Context) {
 		return
 	}
 
-	// Enqueue view job to worker pool for async processing
+	// Update recently viewed in Redis IMMEDIATELY (synchronous)
+	// This ensures the UI updates instantly when user clicks a cartoon
+	log.Printf("Recording view: user_id=%d, cartoon_id=%d", userID, req.CartoonID)
+	if err := services.AddRecentlyViewed(int(userID), int(req.CartoonID)); err != nil {
+		// Log error and return warning message
+		log.Printf("WARNING: Failed to add to recently viewed (Redis may not be running): %v", err)
+		// Continue with database view recording even if Redis fails
+	} else {
+		log.Printf("SUCCESS: Added cartoon %d to recently viewed for user %d", req.CartoonID, userID)
+	}
+
+	// Enqueue view job to worker pool for async processing (database write)
 	// This returns immediately without blocking the HTTP request
 	ViewWorkerPoolInstance.EnqueueViewJob(userID, req.CartoonID)
 
-	// Get current view count for response (might not include the just-enqueued view)
-	var viewCount int64
-	database.DB.Model(&models.View{}).Where("cartoon_id = ?", req.CartoonID).Count(&viewCount)
-
 	// Return immediate response to client
-	// Note: viewCount may not include the enqueued view yet due to async processing
 	c.JSON(http.StatusAccepted, gin.H{
-		"message":         "View recording queued successfully",
-		"cartoon_id":      req.CartoonID,
-		"current_views":   viewCount,
-		"queue_length":    ViewWorkerPoolInstance.GetQueueLength(),
-		"processing_note": "View is being processed asynchronously",
+		"message":    "View recorded successfully",
+		"cartoon_id": req.CartoonID,
 	})
 }
 

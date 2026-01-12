@@ -171,6 +171,7 @@ type CartoonDetailResponse struct {
 	IsFeatured  bool               `json:"is_featured"`
 	CreatedAt   string             `json:"created_at"`
 	UpdatedAt   string             `json:"updated_at"`
+	IMDbRating  string             `json:"imdb_rating"`
 	Genre       *models.Genre      `json:"genre,omitempty"`
 	AgeGroup    *models.AgeGroup   `json:"age_group,omitempty"`
 	Characters  []models.Character `json:"characters,omitempty"`
@@ -213,9 +214,30 @@ func GetCartoonByID(c *gin.Context) {
 		}()
 	}
 
+	// Fetch IMDb rating
+	imdbRating := services.FetchIMDbRating(cartoon.Title)
+
+	// Build response with IMDb rating
+	response := CartoonDetailResponse{
+		ID:          cartoon.ID,
+		Title:       cartoon.Title,
+		Description: cartoon.Description,
+		PosterURL:   cartoon.PosterURL,
+		ReleaseYear: cartoon.ReleaseYear,
+		GenreID:     cartoon.GenreID,
+		AgeGroupID:  cartoon.AgeGroupID,
+		IsFeatured:  cartoon.IsFeatured,
+		CreatedAt:   cartoon.CreatedAt.String(),
+		UpdatedAt:   cartoon.UpdatedAt.String(),
+		IMDbRating:  imdbRating,
+		Genre:       &cartoon.Genre,
+		AgeGroup:    &cartoon.AgeGroup,
+		Characters:  cartoon.Characters,
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Cartoon fetched successfully",
-		"data":    cartoon,
+		"data":    response,
 	})
 }
 
@@ -235,8 +257,8 @@ type TrendingCartoonResponse struct {
 func GetTrendingCartoons(c *gin.Context) {
 	var cartoons []models.Cartoon
 
-	// Fetch all cartoons from database
-	if err := database.DB.Preload("Genre").Preload("AgeGroup").Find(&cartoons).Error; err != nil {
+	// Fetch only top 20 cartoons to reduce load
+	if err := database.DB.Preload("Genre").Preload("AgeGroup").Limit(20).Find(&cartoons).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to fetch cartoons",
 			"error":   err.Error(),
@@ -244,7 +266,7 @@ func GetTrendingCartoons(c *gin.Context) {
 		return
 	}
 
-	// Build response with IMDb ratings
+	// Build response with cached IMDb ratings
 	var trendingList []TrendingCartoonResponse
 	for _, cartoon := range cartoons {
 		imdbRating := services.FetchIMDbRating(cartoon.Title)
