@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cartoon Details - Disney</title>
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/cartoon-details.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="page-header">
+      <button class="back-btn" onclick="goBack()"><span>←</span> Back</button>
+
+      <h1 class="disney-logo">Disney</h1>
+
+      <div class="header-right">
+        <button
+          class="theme-toggle"
+          onclick="toggleTheme()"
+          aria-label="Toggle theme"
+        >
+          <span id="theme-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Section with Background -->
+    <section class="hero-section" id="heroSection">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-poster-wrapper">
+          <img src="" alt="" id="heroPoster" class="hero-poster" />
+          <button
+            class="favorite-btn-large"
+            id="favoriteBtn"
+            onclick="toggleFavorite()"
+          >
+            ❤️
+          </button>
+        </div>
+        <div class="hero-info">
+          <h1 class="cartoon-title" id="cartoonTitle">Loading...</h1>
+          <div class="meta-info">
+            <span class="meta-tag" id="releaseYear"></span>
+            <span class="meta-tag" id="genre"></span>
+            <span class="meta-tag" id="ageGroup"></span>
+            <span class="meta-tag rating-tag" id="rating"></span>
+          </div>
+          <p class="cartoon-description" id="cartoonDescription"></p>
+
+          <!-- Star Rating Section -->
+          <div class="rating-section">
+            <h3 class="rating-title">Rate this cartoon</h3>
+            <div class="star-rating" id="starRating">
+              <span class="star" data-value="1">★</span>
+              <span class="star" data-value="2">★</span>
+              <span class="star" data-value="3">★</span>
+              <span class="star" data-value="4">★</span>
+              <span class="star" data-value="5">★</span>
+              <span class="star" data-value="6">★</span>
+              <span class="star" data-value="7">★</span>
+              <span class="star" data-value="8">★</span>
+              <span class="star" data-value="9">★</span>
+              <span class="star" data-value="10">★</span>
+            </div>
+            <p class="rating-text" id="ratingText">Click to rate</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Details Section -->
+    <main class="details-section">
+      <!-- Characters Section -->
+      <section class="content-block">
+        <h2 class="section-title">Characters</h2>
+        <div class="characters-grid" id="charactersGrid">
+          <div class="skeleton-character"></div>
+          <div class="skeleton-character"></div>
+          <div class="skeleton-character"></div>
+        </div>
+      </section>
+
+      <!-- Additional Info Cards -->
+      <section class="info-cards">
+        <div class="info-card">
+          <div class="info-icon">🎬</div>
+          <div class="info-content">
+            <h3 class="info-label">Genre</h3>
+            <p class="info-value" id="genreInfo">-</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">📅</div>
+          <div class="info-content">
+            <h3 class="info-label">Release Year</h3>
+            <p class="info-value" id="yearInfo">-</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">👥</div>
+          <div class="info-content">
+            <h3 class="info-label">Age Group</h3>
+            <p class="info-value" id="ageInfo">-</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">⭐</div>
+          <div class="info-content">
+            <h3 class="info-label">IMDb Rating</h3>
+            <p class="info-value" id="ratingInfo">-</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/cartoon-details.js"></script>
+  </body>
+</html>

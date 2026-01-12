@@ -1,0 +1,567 @@
+/* ============================================
+   PAGE HEADER
+   ============================================ */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.back-btn {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-btn:hover {
+  background: var(--hover-bg);
+  border-color: #667eea;
+  transform: translateX(-4px);
+}
+
+.back-btn span {
+  font-size: 18px;
+}
+
+.disney-logo {
+  font-size: 40px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  text-align: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Override common.css fixed positioning for page theme toggle */
+.page-header .theme-toggle {
+  position: relative;
+  top: auto;
+  right: auto;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.page-header .page-header .theme-toggle:hover {
+  background: var(--hover-bg);
+  transform: scale(1.05);
+}
+
+.page-header .theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+
+.hero-section {
+  position: relative;
+  min-height: 60vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  padding: 80px 48px;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.7) 0%,
+    var(--bg-primary) 100%
+  );
+  backdrop-filter: blur(5px);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+}
+
+.hero-poster-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.hero-poster {
+  width: 300px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--card-border);
+}
+
+.favorite-btn-large {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 28px;
+  transition: all 0.3s ease;
+  z-index: 10;
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+
+.favorite-btn-large:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 1);
+  opacity: 0.9;
+}
+
+.favorite-btn-large.active {
+  background: rgba(255, 255, 255, 0.95);
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.favorite-btn-large.active:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.2);
+}
+
+.hero-info {
+  flex: 1;
+  color: #000;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(15px);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-width: 700px;
+}
+
+.cartoon-title {
+  font-size: 56px;
+  font-weight: 900;
+  margin-bottom: 24px;
+  letter-spacing: -1px;
+  text-shadow: none;
+  line-height: 1.1;
+  color: #000;
+}
+
+.meta-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.meta-tag {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+.rating-tag {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.4);
+  color: #ffc107;
+}
+
+.cartoon-description {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #000;
+  max-width: 800px;
+  text-shadow: none;
+  margin-bottom: 24px;
+}
+
+/* ============================================
+   STAR RATING SECTION
+   ============================================ */
+
+.rating-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.rating-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 12px;
+}
+
+.star-rating {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.star {
+  font-size: 36px;
+  color: #ccc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-text-stroke: 1px #999;
+}
+
+.star:hover {
+  transform: scale(1.2);
+  color: #ffeb3b;
+  -webkit-text-stroke: 1px #f9a825;
+}
+
+.star.active {
+  color: #ffc107;
+  -webkit-text-stroke: 1px #f57c00;
+}
+
+.star.hover {
+  color: #ffeb3b;
+  -webkit-text-stroke: 1px #f9a825;
+}
+
+.rating-text {
+  font-size: 14px;
+  color: #000;
+  font-weight: 500;
+}
+
+.rating-text.submitted {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+/* ============================================
+   DETAILS SECTION
+   ============================================ */
+
+.details-section {
+  padding: 64px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.content-block {
+  margin-bottom: 64px;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 32px;
+  letter-spacing: -0.5px;
+}
+
+/* ============================================
+   CHARACTERS GRID
+   ============================================ */
+
+.characters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 24px;
+}
+
+.character-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.character-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px var(--shadow);
+  border-color: #667eea;
+}
+
+.character-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--hover-bg);
+}
+
+.character-name {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.skeleton-character {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.skeleton-character::before {
+  content: "";
+  display: block;
+  padding-top: 120%;
+  background: linear-gradient(
+    90deg,
+    var(--card-bg) 25%,
+    var(--hover-bg) 50%,
+    var(--card-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.no-characters {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+}
+
+/* ============================================
+   INFO CARDS
+   ============================================ */
+
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.info-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px var(--shadow);
+  border-color: #667eea;
+}
+
+.info-icon {
+  font-size: 36px;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.info-value {
+  font-size: 20px;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ============================================
+   TOAST
+   ============================================ */
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 24px var(--shadow);
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.toast.success {
+  border-color: #4caf50;
+}
+
+.toast.error {
+  border-color: #f44336;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .hero-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-poster {
+    width: 250px;
+  }
+
+  .cartoon-title {
+    font-size: 40px;
+  }
+
+  .meta-info {
+    justify-content: center;
+  }
+
+  .cartoon-description {
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 16px 24px;
+    flex-wrap: wrap;
+  }
+
+  .disney-logo {
+    font-size: 32px;
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+
+  .header-right {
+    gap: 20px;
+  }
+
+  .hero-section {
+    padding: 48px 24px;
+    min-height: auto;
+  }
+
+  .details-section {
+    padding: 48px 24px;
+  }
+
+  .cartoon-title {
+    font-size: 32px;
+  }
+
+  .cartoon-description {
+    font-size: 16px;
+  }
+
+  .characters-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 16px;
+  }
+
+  .info-cards {
+    grid-template-columns: 1fr;
+  }
+}
