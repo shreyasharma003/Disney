@@ -1,0 +1,331 @@
+/* Disney Channel Theme - Common Styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Subtle professional colors */
+  --disney-blue: #4a90e2;
+  --disney-accent: #6c7a89;
+  --disney-light-bg: #f8f9fa;
+  --disney-white: #ffffff;
+  --disney-text-dark: #2c3e50;
+  --disney-text-light: #6c757d;
+  --disney-shadow: rgba(0, 0, 0, 0.08);
+  --disney-shadow-hover: rgba(0, 0, 0, 0.12);
+
+  /* Light Theme Variables */
+  --bg-gradient-start: #ffffff;
+  --bg-gradient-mid: #ffffff;
+  --bg-gradient-end: #ffffff;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-border: #d0d7de;
+  --text-primary: #24292f;
+  --text-secondary: #57606a;
+  --hover-bg: #f6f8fa;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  --disney-light-bg: #1a1d23;
+  --disney-white: #252a31;
+  --disney-text-dark: #e4e6eb;
+  --disney-text-light: #a0a8b5;
+  --disney-shadow: rgba(0, 0, 0, 0.2);
+
+  --bg-gradient-start: #0d1117;
+  --bg-gradient-mid: #0d1117;
+  --bg-gradient-end: #0d1117;
+  --card-bg: #161b22;
+  --input-bg: #0d1117;
+  --input-border: #30363d;
+  --text-primary: #e4e6eb;
+  --text-secondary: #a0a8b5;
+  --hover-bg: #21262d;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg-gradient-start);
+  min-height: 100vh;
+  color: var(--text-primary);
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 40px 20px 20px;
+}
+
+.logo {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.tagline {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  font-weight: 400;
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px var(--disney-shadow-hover);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: var(--disney-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #3a7bc8;
+}
+
+.btn-secondary {
+  background: var(--disney-accent);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6a79;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+/* Form Styles */
+.form-container {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 500px;
+  margin: 0 auto;
+  border: 1px solid var(--input-border);
+  transition: background 0.3s ease;
+}
+
+.form-title {
+  font-size: 28px;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 24px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--disney-blue);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.form-input::placeholder {
+  color: #b0b0b0;
+}
+
+/* Select dropdown styling */
+select.form-input {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235B9BD5' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  padding-right: 45px;
+}
+
+select.form-input option {
+  padding: 10px;
+}
+
+/* Error and Success Messages */
+.message {
+  padding: 12px 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+}
+
+.error-message {
+  background: #ffe6e6;
+  color: #d32f2f;
+  border: 2px solid #ffcdd2;
+}
+
+.success-message {
+  background: #e8f5e9;
+  color: #388e3c;
+  border: 2px solid #c8e6c9;
+}
+
+/* Loading Spinner */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+  margin-left: 10px;
+}
+
+/* Links */
+.link {
+  color: var(--disney-blue);
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: var(--disney-purple);
+  text-decoration: underline;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+}
+
+.theme-toggle:hover {
+  background: var(--hover-bg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .logo {
+    font-size: 36px;
+  }
+
+  .form-container {
+    padding: 30px 20px;
+  }
+
+  .form-title {
+    font-size: 26px;
+  }
+}

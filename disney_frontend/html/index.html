@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Disney Cartoons ✨</title>
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/homepage.css" />
+  </head>
+  <body>
+    <!-- Netflix-Style Poster Grid Background -->
+    <div class="poster-grid-container">
+      <div class="poster-grid">
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768049598/doraemon_coverimage_ffxg8w.jpg"
+            alt="Doraemon"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113711/Mickey_Mouse_cover_i57ans.jpg"
+            alt="Mickey Mouse"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113654/frozen_cover_vzfjc8.jpg"
+            alt="Frozen"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113677/Phineas_ferb_cover_bwepqi.jpg"
+            alt="Phineas & Ferb"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768052428/Shinchan_cover_x5hixh.jpg"
+            alt="Shinchan"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113657/The_lion_king_cover_tgxzc.webp"
+            alt="The Lion King"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113711/Kiteretsu_Coverimage_hzxyoi.jpg"
+            alt="Kiteretsu"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113660/Tangled_cover_j9prax.webp"
+            alt="Tangled"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113670/Best_of_nikki_cover_ipp08d.jpg"
+            alt="Best of Nikki"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113667/ArtAttack_cover_gxfwnl.jpg"
+            alt="Art Attack"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113672/Sofia_cover_poyt8u.webp"
+            alt="Sofia"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113671/jungle_book_cover_l6evl1.jpg"
+            alt="Jungle Book"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113665/Jack_and_the_neverland_cover_hbpovf.webp"
+            alt="Jake and the Neverland Pirates"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113666/Winnie_the_pooh_cover_jmk588.jpg"
+            alt="Winnie the Pooh"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113663/Peter_Pan_cover_kbzqic.jpg"
+            alt="Peter Pan"
+          />
+        </div>
+        <!-- <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113657/The_lion_king_cover_tgzxzc.webp"
+            alt="The Lion King"
+          />
+        </div> -->
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113634/Aladdin_cover_xjgnki.webp"
+            alt="Aladdin"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768049598/doraemon_coverimage_ffxg8w.jpg"
+            alt="Doraemon"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768049598/doraemon_coverimage_ffxg8w.jpg"
+            alt="Doraemon"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113711/Mickey_Mouse_cover_i57ans.jpg"
+            alt="Mickey Mouse"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768113654/frozen_cover_vzfjc8.jpg"
+            alt="Frozen"
+          />
+        </div>
+        <div class="poster">
+          <img
+            src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768052428/Shinchan_cover_x5hixh.jpg"
+            alt="Shinchan"
+          />
+        </div>
+      </div>
+      <!-- Dark overlay for depth -->
+      <div class="grid-overlay"></div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button
+      class="theme-toggle"
+      onclick="toggleTheme()"
+      aria-label="Toggle theme"
+    >
+      <span id="theme-icon">🌙</span>
+    </button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h1 class="hero-title">Disney Cartoons ✨</h1>
+      <p class="hero-subtitle">Where Magic Comes to Life</p>
+
+      <!-- Glass Cards Container -->
+      <div class="cards-grid">
+        <!-- USER Card -->
+        <div class="glass-card user-card">
+          <h2 class="card-title">USER</h2>
+          <p class="card-desc">
+            Watch your favorite Disney cartoons and discover new adventures!
+          </p>
+          <ul class="features-list">
+            <li>⭐ Watch Cartoons</li>
+            <li>❤️ Save Favorites</li>
+            <li>⭐ Rate & Review</li>
+          </ul>
+          <div class="card-buttons">
+            <button class="btn-primary" onclick="navigateToSignup('user')">
+              Sign Up
+            </button>
+            <button class="btn-outline" onclick="navigateToLogin('user')">
+              Login
+            </button>
+          </div>
+        </div>
+
+        <!-- ADMIN Card -->
+        <div class="glass-card admin-card">
+          <h2 class="card-title">ADMIN</h2>
+          <p class="card-desc">
+            Manage content and create magical experiences for users!
+          </p>
+          <ul class="features-list">
+            <li>🎬 Manage Cartoons</li>
+            <li>➕ Add Content</li>
+            <li>📊 View Analytics</li>
+          </ul>
+          <div class="card-buttons">
+            <button class="btn-primary" onclick="navigateToSignup('admin')">
+              Sign Up
+            </button>
+            <button class="btn-outline" onclick="navigateToLogin('admin')">
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/homepage.js"></script>
+  </body>
+</html>

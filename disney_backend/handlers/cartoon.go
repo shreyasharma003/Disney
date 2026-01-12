@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -61,7 +62,6 @@ func GetCartoonsByCharacter(c *gin.Context) {
 		})
 		return
 	}
-	
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Cartoons fetched successfully",
@@ -161,19 +161,19 @@ func GetCartoonsByAgeGroup(c *gin.Context) {
 
 // CartoonDetailResponse represents the cartoon detail response with IMDb rating
 type CartoonDetailResponse struct {
-	ID          uint             `json:"id"`
-	Title       string           `json:"title"`
-	Description string           `json:"description"`
-	PosterURL   string           `json:"poster_url"`
-	ReleaseYear int              `json:"release_year"`
-	GenreID     uint             `json:"genre_id"`
-	AgeGroupID  uint             `json:"age_group_id"`
-	IsFeatured  bool             `json:"is_featured"`
-	CreatedAt   string           `json:"created_at"`
-	UpdatedAt   string           `json:"updated_at"`
-	IMDbRating  string           `json:"imdb_rating"`
-	Genre       *models.Genre    `json:"genre,omitempty"`
-	AgeGroup    *models.AgeGroup `json:"age_group,omitempty"`
+	ID          uint               `json:"id"`
+	Title       string             `json:"title"`
+	Description string             `json:"description"`
+	PosterURL   string             `json:"poster_url"`
+	ReleaseYear int                `json:"release_year"`
+	GenreID     uint               `json:"genre_id"`
+	AgeGroupID  uint               `json:"age_group_id"`
+	IsFeatured  bool               `json:"is_featured"`
+	CreatedAt   string             `json:"created_at"`
+	UpdatedAt   string             `json:"updated_at"`
+	Genre       *models.Genre      `json:"genre,omitempty"`
+	AgeGroup    *models.AgeGroup   `json:"age_group,omitempty"`
+	Characters  []models.Character `json:"characters,omitempty"`
 }
 
 // GetCartoonByID retrieves a specific cartoon by its ID and tracks it as recently viewed
@@ -188,7 +188,7 @@ func GetCartoonByID(c *gin.Context) {
 	}
 
 	var cartoon models.Cartoon
-	if err := database.DB.Preload("Genre").Preload("AgeGroup").
+	if err := database.DB.Preload("Genre").Preload("AgeGroup").Preload("Characters").
 		First(&cartoon, cartoonID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message": "Cartoon not found",
@@ -203,7 +203,7 @@ func GetCartoonByID(c *gin.Context) {
 		// userID from context is uint, convert to int
 		uid := int(userID.(uint))
 		cid := int(cartoon.ID)
-		
+
 		// Add to recently viewed cache (async - don't block response if Redis fails)
 		go func() {
 			if err := services.AddRecentlyViewed(uid, cid); err != nil {
@@ -284,13 +284,13 @@ func GetTrendingCartoons(c *gin.Context) {
 
 // CreateCartoonRequest represents the request to create a new cartoon with characters
 type CreateCartoonRequest struct {
-	Title       string                 `json:"title" binding:"required"`
-	Description string                 `json:"description"`
-	PosterURL   string                 `json:"poster_url"`
-	ReleaseYear int                    `json:"release_year" binding:"required"`
-	GenreID     uint                   `json:"genre_id" binding:"required"`
-	AgeGroupID  uint                   `json:"age_group_id" binding:"required"`
-	IsFeatured  bool                   `json:"is_featured"`
+	Title       string                   `json:"title" binding:"required"`
+	Description string                   `json:"description"`
+	PosterURL   string                   `json:"poster_url"`
+	ReleaseYear int                      `json:"release_year" binding:"required"`
+	GenreID     uint                     `json:"genre_id" binding:"required"`
+	AgeGroupID  uint                     `json:"age_group_id" binding:"required"`
+	IsFeatured  bool                     `json:"is_featured"`
 	Characters  []CreateCharacterRequest `json:"characters"`
 }
 
@@ -440,13 +440,13 @@ func DeleteCartoon(c *gin.Context) {
 
 // GetRecentlyViewedRequest is the response structure for recently viewed cartoons
 type GetRecentlyViewedResponse struct {
-	CartoonID   uint        `json:"cartoon_id"`
-	Title       string      `json:"title"`
-	Description string      `json:"description"`
-	PosterURL   string      `json:"poster_url"`
-	ReleaseYear int         `json:"release_year"`
-	Genre       models.Genre      `json:"genre,omitempty"`
-	AgeGroup    models.AgeGroup   `json:"age_group,omitempty"`
+	CartoonID   uint            `json:"cartoon_id"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	PosterURL   string          `json:"poster_url"`
+	ReleaseYear int             `json:"release_year"`
+	Genre       models.Genre    `json:"genre,omitempty"`
+	AgeGroup    models.AgeGroup `json:"age_group,omitempty"`
 }
 
 // GetRecentlyViewed fetches the recently viewed cartoons for the authenticated user

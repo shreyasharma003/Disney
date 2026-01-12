@@ -1,28 +1,29 @@
 package main
 
 import (
+	"disney/config"
 	"disney/database"
 	"disney/handlers"
 	"disney/routes"
-	"disney/workers"
-	"disney/config"
 	"disney/services"
+	"disney/workers"
 	"fmt"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	godotenv.Load()
-	
+
 	// Initialize database
 	database.InitDB()
-	
+
 	// Initialize Redis
 	config.InitRedis()
 	defer config.CloseRedis()
-	
+
 	// Set Redis client in services
 	services.SetRedisClient(config.RedisClient)
 
@@ -40,6 +41,13 @@ func main() {
 
 	// Create Gin router
 	router := gin.Default()
+
+	//Configure CORS - Allow all origins for development
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept"}
+	router.Use(cors.New(config))
 
 	// Public Auth routes (no authentication required)
 	auth := router.Group("/api/auth")
