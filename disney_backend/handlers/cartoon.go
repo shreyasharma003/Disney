@@ -62,7 +62,6 @@ func GetCartoonsByCharacter(c *gin.Context) {
 		})
 		return
 	}
-	
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Cartoons fetched successfully",
@@ -205,7 +204,7 @@ func GetCartoonByID(c *gin.Context) {
 		// userID from context is uint, convert to int
 		uid := int(userID.(uint))
 		cid := int(cartoon.ID)
-		
+
 		// Add to recently viewed cache (async - don't block response if Redis fails)
 		go func() {
 			if err := services.AddRecentlyViewed(uid, cid); err != nil {
@@ -307,13 +306,13 @@ func GetTrendingCartoons(c *gin.Context) {
 
 // CreateCartoonRequest represents the request to create a new cartoon with characters
 type CreateCartoonRequest struct {
-	Title       string                 `json:"title" binding:"required"`
-	Description string                 `json:"description"`
-	PosterURL   string                 `json:"poster_url"`
-	ReleaseYear int                    `json:"release_year" binding:"required"`
-	GenreID     uint                   `json:"genre_id" binding:"required"`
-	AgeGroupID  uint                   `json:"age_group_id" binding:"required"`
-	IsFeatured  bool                   `json:"is_featured"`
+	Title       string                   `json:"title" binding:"required"`
+	Description string                   `json:"description"`
+	PosterURL   string                   `json:"poster_url"`
+	ReleaseYear int                      `json:"release_year" binding:"required"`
+	GenreID     uint                     `json:"genre_id" binding:"required"`
+	AgeGroupID  uint                     `json:"age_group_id" binding:"required"`
+	IsFeatured  bool                     `json:"is_featured"`
 	Characters  []CreateCharacterRequest `json:"characters"`
 }
 
@@ -463,13 +462,13 @@ func DeleteCartoon(c *gin.Context) {
 
 // GetRecentlyViewedRequest is the response structure for recently viewed cartoons
 type GetRecentlyViewedResponse struct {
-	CartoonID   uint        `json:"cartoon_id"`
-	Title       string      `json:"title"`
-	Description string      `json:"description"`
-	PosterURL   string      `json:"poster_url"`
-	ReleaseYear int         `json:"release_year"`
-	Genre       models.Genre      `json:"genre,omitempty"`
-	AgeGroup    models.AgeGroup   `json:"age_group,omitempty"`
+	CartoonID   uint            `json:"cartoon_id"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	PosterURL   string          `json:"poster_url"`
+	ReleaseYear int             `json:"release_year"`
+	Genre       models.Genre    `json:"genre,omitempty"`
+	AgeGroup    models.AgeGroup `json:"age_group,omitempty"`
 }
 
 // GetRecentlyViewed fetches the recently viewed cartoons for the authenticated user

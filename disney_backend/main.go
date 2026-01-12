@@ -16,14 +16,14 @@ import (
 
 func main() {
 	godotenv.Load()
-	
+
 	// Initialize database
 	database.InitDB()
-	
+
 	// Initialize Redis
 	config.InitRedis()
 	defer config.CloseRedis()
-	
+
 	// Set Redis client in services
 	services.SetRedisClient(config.RedisClient)
 
