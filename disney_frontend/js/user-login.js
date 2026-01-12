@@ -74,9 +74,6 @@ document.addEventListener("DOMContentLoaded", function () {
         // Success
         showSuccess(data.message || "Login successful!");
 
-        // Redirect to homepage after 1 second
-        setTimeout(() => {
-          window.location.href = "index.html";
         // Redirect to user dashboard after 1 second
         setTimeout(() => {
           window.location.href = "user-dashboard.html";

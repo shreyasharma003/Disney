@@ -74,9 +74,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Success
         showSuccess(data.message || "Admin login successful!");
 
-        // Redirect to homepage after 1 second
+        // Redirect to admin dashboard after 1 second
         setTimeout(() => {
-          window.location.href = "index.html";
+          window.location.href = "admin-dashboard.html";
         }, 1000);
       } else {
         // Error from server
