@@ -10,13 +10,13 @@ import (
 
 // UpdateRatingRequest represents the request payload to update a rating
 type UpdateRatingRequest struct {
-	Rating int `json:"rating" binding:"required,min=1,max=5"`
+	Rating int `json:"rating" binding:"required,min=1,max=10"`
 }
 
 // AddRatingRequest represents the request payload to add a rating
 type AddRatingRequest struct {
 	CartoonID uint `json:"cartoon_id" binding:"required"`
-	Rating    int  `json:"rating" binding:"required,min=1,max=5"`
+	Rating    int  `json:"rating" binding:"required,min=1,max=10"`
 }
 
 // AddRating adds a rating for a cartoon (User only)
@@ -31,10 +31,10 @@ func AddRating(c *gin.Context) {
 		return
 	}
 
-	// Validate rating is between 1-5
-	if req.Rating < 1 || req.Rating > 5 {
+	// Validate rating is between 1-10
+	if req.Rating < 1 || req.Rating > 10 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Rating must be between 1 and 5",
+			"error": "Rating must be between 1 and 10",
 		})
 		return
 	}

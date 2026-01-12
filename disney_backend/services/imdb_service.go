@@ -1,11 +1,14 @@
 package services
 
 import (
+	"context"
+	"disney/config"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 // OMDbResponse represents the response structure from OMDb API
@@ -19,7 +22,19 @@ type OMDbResponse struct {
 
 // FetchIMDbRating fetches the IMDb rating for a cartoon from OMDb API
 // Returns the imdbRating string or "N/A" if not found or API fails
+// Results are cached in Redis for 24 hours
 func FetchIMDbRating(cartoonTitle string) string {
+	// Check Redis cache first
+	ctx := context.Background()
+	cacheKey := "imdb:" + cartoonTitle
+	
+	if config.RedisClient != nil {
+		cachedRating, err := config.RedisClient.Get(ctx, cacheKey).Result()
+		if err == nil && cachedRating != "" {
+			return cachedRating
+		}
+	}
+
 	// Get API key from environment variables
 	apiKey := os.Getenv("OMDB_API_KEY")
 	if apiKey == "" {
@@ -35,8 +50,11 @@ func FetchIMDbRating(cartoonTitle string) string {
 
 	fullURL := baseURL + "?" + params.Encode()
 
-	// Make HTTP GET request
-	resp, err := http.Get(fullURL)
+	// Make HTTP GET request with timeout
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+	resp, err := client.Get(fullURL)
 	if err != nil {
 		return "N/A"
 	}
@@ -67,6 +85,11 @@ func FetchIMDbRating(cartoonTitle string) string {
 	// Return imdbRating or N/A if empty
 	if omdbResp.ImdbRating == "" || omdbResp.ImdbRating == "N/A" {
 		return "N/A"
+	}
+
+	// Cache the result in Redis for 24 hours
+	if config.RedisClient != nil {
+		config.RedisClient.Set(ctx, cacheKey, omdbResp.ImdbRating, 24*time.Hour)
 	}
 
 	return omdbResp.ImdbRating
