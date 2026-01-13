@@ -154,11 +154,15 @@ func (AdminLog) TableName() string {
 // RequestLog Table
 type RequestLog struct {
 	ID           uint      `gorm:"primaryKey" json:"id"`
+	UserID       *uint     `gorm:"index" json:"user_id,omitempty"` // nullable for anonymous requests
 	Endpoint     string    `gorm:"type:varchar(500);not null;index" json:"endpoint"`
 	Method       string    `gorm:"type:varchar(10);not null" json:"method"`
 	ResponseTime int       `gorm:"type:int" json:"response_time"` // in milliseconds
 	StatusCode   int       `gorm:"type:int;index" json:"status_code"`
 	CreatedAt    time.Time `gorm:"index" json:"created_at"`
+
+	// Foreign key relationship
+	User *User `gorm:"foreignKey:UserID;constraint:OnDelete:SET NULL" json:"user,omitempty"`
 }
 
 // Table naming manually

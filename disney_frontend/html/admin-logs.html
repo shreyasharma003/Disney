@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Logs & Analytics - Disney</title>
+    <link rel="stylesheet" href="../css/admin-logs.css" />
+  </head>
+  <body>
+    <!-- Top Navbar -->
+    <nav class="navbar">
+      <div class="navbar-left">
+        <h2 class="page-title">Admin Logs</h2>
+      </div>
+      <div class="navbar-right">
+        <div class="user-info">
+          <span id="user-email" class="user-email">User</span>
+          <button class="btn btn-secondary btn-small" onclick="handleLogout()">
+            Logout
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Content Area -->
+    <div class="main-content">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="header-left">
+            <!-- <h1>Activity Logs</h1> -->
+            <!-- <p class="subtitle">Track all admin activities and changes</p> -->
+          </div>
+          <button class="btn btn-secondary" onclick="goBack()">
+            ← Back to Dashboard
+          </button>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+          <div class="filter-group">
+            <label>Filter by Action:</label>
+            <select
+              id="action-filter"
+              class="filter-select"
+              onchange="applyFilters()"
+            >
+              <option value="">All Actions</option>
+              <option value="CREATE">Create</option>
+              <option value="UPDATE">Update</option>
+              <option value="DELETE">Delete</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Filter by Entity:</label>
+            <select
+              id="entity-filter"
+              class="filter-select"
+              onchange="applyFilters()"
+            >
+              <option value="">All Entities</option>
+              <option value="CARTOON">Cartoon</option>
+              <option value="CHARACTER">Character</option>
+            </select>
+          </div>
+
+          <div class="filter-group" style="flex: 2">
+            <label>Date Range:</label>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <input
+                type="date"
+                id="date-from"
+                class="filter-input"
+                onchange="applyFilters()"
+                style="flex: 1"
+              />
+              <span style="white-space: nowrap">to</span>
+              <input
+                type="date"
+                id="date-to"
+                class="filter-input"
+                onchange="applyFilters()"
+                style="flex: 1"
+              />
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: flex-end">
+            <button class="btn btn-secondary" onclick="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-section">
+          <div class="stat-card">
+            <div class="stat-number" id="total-logs">0</div>
+            <div class="stat-label">Total Activities</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="create-count">0</div>
+            <div class="stat-label">Created</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="update-count">0</div>
+            <div class="stat-label">Updated</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="delete-count">0</div>
+            <div class="stat-label">Deleted</div>
+          </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="logs-loading" class="loading hidden">
+          <div class="spinner"></div>
+          <p>Loading activity logs...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="logs-error" class="error-message hidden"></div>
+
+        <!-- Logs Table -->
+        <div class="logs-table-container">
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Admin</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Date & Time</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody">
+              <tr>
+                <td colspan="5" class="no-data">No logs found</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- No Results -->
+        <div id="no-logs" class="no-results hidden">
+          <p>No activity logs found.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="error-alert" class="error-alert hidden">
+      <p id="error-text"></p>
+    </div>
+
+    <script src="../js/admin-logs.js"></script>
+  </body>
+</html>

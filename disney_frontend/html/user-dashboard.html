@@ -10,11 +10,13 @@
   <body>
     <!-- Header -->
     <header class="dashboard-header">
-      <button class="logout-btn" onclick="handleLogout()">
-        <span>🚪</span> Logout
-      </button>
+      <button class="logout-btn" onclick="handleLogout()">Logout</button>
 
-      <h1 class="disney-logo">Disney</h1>
+      <img
+        src="https://res.cloudinary.com/dup6kejm4/image/upload/v1768215003/Disney-Logo-PNG-File_1_qtonuv.png"
+        alt="Disney Logo"
+        class="disney-logo"
+      />
 
       <div class="header-right">
         <span class="welcome-msg" id="welcomeMsg">Welcome, User</span>
@@ -27,6 +29,42 @@
         </button>
       </div>
     </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="dashboard-nav">
+      <button
+        class="nav-tab active"
+        data-tab="dashboard"
+        onclick="switchTab('dashboard')"
+      >
+        <span class="tab-icon"></span>
+        <span class="tab-text">Dashboard</span>
+      </button>
+      <button
+        class="nav-tab"
+        data-tab="all-cartoons"
+        onclick="switchTab('all-cartoons')"
+      >
+        <span class="tab-icon"></span>
+        <span class="tab-text">All Cartoons</span>
+      </button>
+      <button
+        class="nav-tab"
+        data-tab="favourites"
+        onclick="switchTab('favourites')"
+      >
+        <span class="tab-icon"></span>
+        <span class="tab-text">Favourites</span>
+      </button>
+      <button
+        class="nav-tab"
+        data-tab="recently-viewed"
+        onclick="switchTab('recently-viewed')"
+      >
+        <span class="tab-icon"></span>
+        <span class="tab-text">Recently Viewed</span>
+      </button>
+    </nav>
 
     <!-- Search Section -->
     <section class="search-section">
@@ -61,13 +99,21 @@
 
         <select id="yearFilter" class="filter-dropdown">
           <option value="">All Years</option>
-          <option value="2020-2024">2020-2024</option>
-          <option value="2015-2019">2015-2019</option>
-          <option value="2010-2014">2010-2014</option>
-          <option value="2000-2009">2000-2009</option>
-          <option value="1990-1999">1990-1999</option>
-          <option value="before-1990">Before 1990</option>
+          <option value="1995-2000">1995 - 2000</option>
+          <option value="2000-2005">2000 - 2005</option>
+          <option value="2005-2010">2005 - 2010</option>
+          <option value="2010-2015">2010 - 2015</option>
+          <option value="2015-2020">2015 - 2020</option>
+          <option value="2020-2025">2020 - 2025</option>
         </select>
+
+        <button
+          class="clear-all-btn"
+          id="clearAllBtn"
+          onclick="clearAllFilters()"
+        >
+          Clear All
+        </button>
       </div>
 
       <!-- Search Results -->
@@ -80,60 +126,80 @@
 
     <!-- Main Content -->
     <main class="dashboard-content">
-      <!-- Browse All Cartoons Section -->
-      <section class="content-section browse-section">
-        <div class="browse-banner">
-          <div class="browse-content">
-            <h2 class="browse-title">🎬 Explore All Disney Cartoons</h2>
-            <p class="browse-description">
-              Discover our complete collection of magical stories and beloved
-              characters
-            </p>
-            <button class="browse-btn" onclick="navigateToCartoonList()">
-              <span>View All Cartoons</span>
-              <span class="arrow">→</span>
+      <!-- Dashboard Tab Content -->
+      <div class="tab-content active" id="dashboard-content">
+        <!-- Trending Section -->
+        <section class="content-section">
+          <h2 class="section-title">Trending Now</h2>
+          <div class="cards-container horizontal-scroll" id="trendingContainer">
+            <!-- Loading skeleton -->
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- All Cartoons Tab Content -->
+      <div class="tab-content" id="all-cartoons-content">
+        <section class="content-section">
+          <h2 class="section-title">All Cartoons</h2>
+          <div class="cards-container" id="allCartoonsContainer">
+            <!-- Loading skeleton -->
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="pagination-controls" id="paginationControls">
+            <button
+              class="pagination-btn"
+              id="prevPageBtn"
+              onclick="changePage(-1)"
+            >
+              ← Previous
+            </button>
+            <span class="page-info" id="pageInfo">Page 1</span>
+            <button
+              class="pagination-btn"
+              id="nextPageBtn"
+              onclick="changePage(1)"
+            >
+              Next →
             </button>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <!-- Trending Section -->
-      <section class="content-section">
-        <h2 class="section-title">Trending Now 🔥</h2>
-        <div class="cards-container horizontal-scroll" id="trendingContainer">
-          <!-- Loading skeleton -->
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
-        </div>
-      </section>
+      <!-- Favourites Tab Content -->
+      <div class="tab-content" id="favourites-content">
+        <section class="content-section">
+          <h2 class="section-title">Your Favourites</h2>
+          <div class="cards-container" id="favoritesTabContainer">
+            <!-- Loading skeleton -->
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </section>
+      </div>
 
-      <!-- Favourites Section -->
-      <section class="content-section">
-        <h2 class="section-title">Your Favourites ❤️</h2>
-        <div class="cards-container horizontal-scroll" id="favoritesContainer">
-          <!-- Loading skeleton -->
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
-        </div>
-      </section>
-
-      <!-- Recently Viewed Section -->
-      <section class="content-section">
-        <h2 class="section-title">Continue Watching 👀</h2>
-        <div
-          class="cards-container horizontal-scroll"
-          id="recentlyViewedContainer"
-        >
-          <!-- Loading skeleton -->
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
-        </div>
-      </section>
+      <!-- Recently Viewed Tab Content -->
+      <div class="tab-content" id="recently-viewed-content">
+        <section class="content-section">
+          <h2 class="section-title">Continue Watching</h2>
+          <div class="cards-container" id="recentlyViewedTabContainer">
+            <!-- Loading skeleton -->
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </section>
+      </div>
     </main>
 
     <!-- Toast Notification -->

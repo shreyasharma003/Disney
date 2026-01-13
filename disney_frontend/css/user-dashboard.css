@@ -28,6 +28,14 @@
   --cutout-opacity: 0.2;
 }
 
+[data-theme="light"] body {
+  background-image: url("../src/light-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
 /* ============================================
    BASE STYLES
    ============================================ */
@@ -35,10 +43,12 @@
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
   position: relative;
   transition: background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ============================================
@@ -49,59 +59,94 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 48px;
-  background: var(--bg-secondary);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--card-border);
+  padding: 20px 48px;
+  background: transparent;
+  border: none;
   position: sticky;
   top: 0;
   z-index: 100;
   transition: all 0.3s ease;
+  min-height: 80px;
+  position: relative;
 }
 
 .logout-btn {
   padding: 10px 20px;
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid rgba(255, 107, 107, 0.3);
+  background: transparent;
+  border: 2px solid #ff6b6b;
   border-radius: 8px;
   color: #ff6b6b;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  height: fit-content;
+  flex-shrink: 0;
+}
+
+[data-theme="light"] .logout-btn {
+  color: #ffffff;
+  background: #b71c1c;
+  border-color: #b71c1c;
+  text-shadow: none;
 }
 
 .logout-btn:hover {
-  background: rgba(255, 107, 107, 0.2);
+  background: #ff6b6b;
+  color: #ffffff;
   transform: translateY(-2px);
+  text-shadow: none;
+}
+
+[data-theme="light"] .logout-btn:hover {
+  background: #8b0000;
+  border-color: #8b0000;
+  color: #ffffff;
 }
 
 .disney-logo {
-  font-size: 48px;
-  font-weight: 900;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 2px;
-  text-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  height: 60px;
+  width: auto;
   margin: 0;
+  display: block;
+  filter: brightness(0) drop-shadow(0 2px 4px rgba(255, 255, 255, 0.3));
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.disney-logo:hover {
+  transform: translateX(-50%) scale(1.05);
+}
+
+[data-theme="light"] .disney-logo {
+  filter: brightness(0) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 24px;
+  height: fit-content;
 }
 
 .welcome-msg {
   font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-weight: 700;
+  color: #ffffff;
   white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .welcome-msg {
+  color: #1a1a1a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 /* Override common.css fixed positioning for dashboard theme toggle */
@@ -109,8 +154,8 @@ body {
   position: relative;
   top: auto;
   right: auto;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+  background: transparent;
+  border: 2px solid #667eea;
   border-radius: 8px;
   width: 44px;
   height: 44px;
@@ -122,11 +167,23 @@ body {
   transition: all 0.3s ease;
   box-shadow: none;
   flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+[data-theme="light"] .dashboard-header .theme-toggle {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .dashboard-header .theme-toggle:hover {
-  background: var(--hover-bg);
+  background: #667eea;
   transform: scale(1.05);
+}
+
+[data-theme="light"] .dashboard-header .theme-toggle:hover {
+  background: #000000;
+  border-color: #000000;
 }
 
 .dashboard-header .theme-toggle:active {
@@ -134,13 +191,115 @@ body {
 }
 
 /* ============================================
+   DASHBOARD NAVIGATION TABS
+   ============================================ */
+
+.dashboard-nav {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px 48px;
+  background: transparent;
+  border: none;
+  position: sticky;
+  top: 80px;
+  z-index: 100;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 160px;
+  justify-content: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .nav-tab {
+  border-color: rgba(0, 0, 0, 0.4);
+  color: #1a1a1a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.nav-tab:hover {
+  background: rgba(102, 126, 234, 0.3);
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] .nav-tab:hover {
+  background: rgba(118, 75, 162, 0.2);
+  border-color: #764ba2;
+}
+
+.nav-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.6);
+  text-shadow: none;
+}
+
+[data-theme="dark"] .nav-tab.active {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.tab-icon {
+  font-size: 20px;
+}
+
+.tab-text {
+  white-space: nowrap;
+}
+
+/* ============================================
+   TAB CONTENT
+   ============================================ */
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
    SEARCH SECTION
    ============================================ */
 
 .search-section {
-  padding: 32px 48px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 24px 48px;
+  max-width: 100%;
+  background: transparent;
+  position: sticky;
+  top: 180px;
+  z-index: 90;
+  flex-shrink: 0;
 }
 
 .search-container {
@@ -206,6 +365,40 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.clear-all-btn {
+  padding: 14px 24px;
+  border: 2px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.clear-all-btn:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: translateY(-2px);
+}
+
+.clear-all-btn:active {
+  transform: translateY(0);
+}
+
+[data-theme="light"] .clear-all-btn {
+  background: #f5f5f5;
+  border-color: #ddd;
+}
+
+[data-theme="light"] .clear-all-btn:hover {
+  background: #e8e8e8;
+  border-color: #667eea;
   outline: none;
   min-width: 150px;
 }
@@ -233,9 +426,12 @@ body {
    ============================================ */
 
 .dashboard-content {
-  padding: 0 48px 48px;
+  padding: 24px 48px 48px;
   max-width: 1400px;
   margin: 0 auto;
+  overflow-y: auto;
+  flex: 1;
+  height: 0;
 }
 
 .content-section {
@@ -360,15 +556,29 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* ============================================
+   CARDS CONTAINER
+   ============================================ */
+
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 24px;
+  padding: 8px 0;
 }
 
 .horizontal-scroll {
-  overflow: visible;
-  padding-bottom: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  max-width: 100%;
+}
+
+/* Tab content full width grid */
+#favoritesTabContainer,
+#recentlyViewedTabContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 28px;
+  padding: 16px 0;
 }
 
 .horizontal-scroll::-webkit-scrollbar {
@@ -525,6 +735,94 @@ body {
 }
 
 /* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-secondary);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.empty-state small {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* ============================================
+   ALL CARTOONS SEARCH & PAGINATION
+   ============================================ */
+
+.all-cartoons-search {
+  margin-bottom: 24px;
+}
+
+.all-cartoons-search .search-input {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: block;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  margin-top: 48px;
+  padding: 24px 0;
+}
+
+.pagination-btn {
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .pagination-btn {
+  border-color: rgba(0, 0, 0, 0.4);
+  color: #1a1a1a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: rgba(102, 126, 234, 0.3);
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] .pagination-btn:hover:not(:disabled) {
+  background: rgba(118, 75, 162, 0.2);
+  border-color: #764ba2;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 120px;
+  text-align: center;
+}
+
+/* ============================================
    TOAST NOTIFICATION
    ============================================ */
 
@@ -604,6 +902,26 @@ body {
 
   .welcome-msg {
     font-size: 14px;
+  }
+
+  .dashboard-nav {
+    padding: 16px 24px;
+    gap: 8px;
+    top: 120px;
+  }
+
+  .nav-tab {
+    padding: 10px 16px;
+    min-width: auto;
+    flex: 1;
+  }
+
+  .tab-text {
+    font-size: 13px;
+  }
+
+  .tab-icon {
+    font-size: 18px;
   }
 
   .search-section {

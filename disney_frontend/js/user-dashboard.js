@@ -105,11 +105,9 @@ async function loadGenres() {
 // ============================================
 
 async function loadFavoritesAndData() {
-  // Load favorites first to populate the global set
-  await loadFavorites();
-  // Then load other sections
+  // Only load trending on initial page load
   loadTrending();
-  loadRecentlyViewed();
+  // Favourites and Recently Viewed will be loaded when user clicks their tabs
 }
 
 // ============================================
@@ -446,11 +444,27 @@ async function performSearch() {
       cartoons = result.data.data || result.data || [];
     }
   } else if (year && !genre) {
-    // Filter by year only
-    const result = await apiRequest(`/admin/cartoons/by-year?year=${year}`);
-    if (result && result.ok) {
-      cartoons = result.data.data || result.data || [];
+    // Filter by year range
+    const [startYear, endYear] = year.split("-").map(Number);
+    const yearResults = [];
+
+    // Fetch cartoons for each year in the range
+    for (let y = startYear; y <= endYear; y++) {
+      const result = await apiRequest(`/admin/cartoons/by-year?year=${y}`);
+      if (result && result.ok) {
+        const yearCartoons = result.data.data || result.data || [];
+        yearResults.push(...yearCartoons);
+      }
     }
+
+    // Remove duplicates by cartoon ID
+    const uniqueCartoons = new Map();
+    yearResults.forEach((cartoon) => {
+      if (!uniqueCartoons.has(cartoon.id)) {
+        uniqueCartoons.set(cartoon.id, cartoon);
+      }
+    });
+    cartoons = Array.from(uniqueCartoons.values());
   } else if (genre && year) {
     // Both genre and year
     const genreMap = {
@@ -468,8 +482,11 @@ async function performSearch() {
     );
     if (result && result.ok) {
       cartoons = result.data.data || result.data || [];
-      // Filter by year client-side
-      cartoons = cartoons.filter((c) => c.release_year == year);
+      // Filter by year range client-side
+      const [startYear, endYear] = year.split("-").map(Number);
+      cartoons = cartoons.filter(
+        (c) => c.release_year >= startYear && c.release_year <= endYear
+      );
     }
   }
 
@@ -491,7 +508,10 @@ async function performSearch() {
       );
     }
     if (year) {
-      cartoons = cartoons.filter((c) => c.release_year == year);
+      const [startYear, endYear] = year.split("-").map(Number);
+      cartoons = cartoons.filter(
+        (c) => c.release_year >= startYear && c.release_year <= endYear
+      );
     }
   }
 
@@ -545,6 +565,23 @@ function setupFilterListeners() {
       performSearch();
     }
   });
+}
+
+function clearAllFilters() {
+  // Clear search input
+  const searchInput = document.getElementById("searchInput");
+  const clearBtn = document.getElementById("clearSearchBtn");
+  searchInput.value = "";
+  clearBtn.style.display = "none";
+
+  // Reset genre filter
+  document.getElementById("genreFilter").value = "";
+
+  // Reset year filter
+  document.getElementById("yearFilter").value = "";
+
+  // Hide search results
+  hideSearchResults();
 }
 
 // ============================================
@@ -605,4 +642,217 @@ function addBackgroundCutouts() {
 // Call when cutout URLs are available
 if (cutoutUrls.length > 0) {
   addBackgroundCutouts();
+}
+
+// ============================================
+// TAB SWITCHING FUNCTIONALITY
+// ============================================
+
+// Pagination state
+let currentPage = 1;
+let allCartoonsData = [];
+const cartoonsPerPage = 5;
+
+function switchTab(tabName) {
+  // Update active tab button
+  document.querySelectorAll(".nav-tab").forEach((tab) => {
+    tab.classList.remove("active");
+  });
+  document.querySelector(`[data-tab="${tabName}"]`).classList.add("active");
+
+  // Update active content
+  document.querySelectorAll(".tab-content").forEach((content) => {
+    content.classList.remove("active");
+  });
+  document.getElementById(`${tabName}-content`).classList.add("active");
+
+  // Load data for the selected tab if not already loaded
+  if (tabName === "all-cartoons") {
+    loadAllCartoonsTab();
+  } else if (tabName === "favourites") {
+    loadFavoritesTab();
+  } else if (tabName === "recently-viewed") {
+    loadRecentlyViewedTab();
+  }
+}
+
+// ============================================
+// LOAD ALL CARTOONS TAB WITH PAGINATION
+// ============================================
+
+async function loadAllCartoonsTab() {
+  console.log("Loading all cartoons...");
+  const container = document.getElementById("allCartoonsContainer");
+
+  // Show loading state
+  container.innerHTML = `
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+  `;
+
+  const result = await apiRequest("/admin/cartoons/names");
+  console.log("All cartoons API response:", result);
+
+  if (result && result.ok) {
+    allCartoonsData = result.data.data || result.data || [];
+    console.log("All cartoons data:", allCartoonsData);
+    currentPage = 1;
+    renderAllCartoonsPage();
+  } else {
+    console.error("Failed to load all cartoons:", result);
+    container.innerHTML =
+      '<div class="empty-state">Failed to load cartoons</div>';
+  }
+}
+
+function renderAllCartoonsPage(filteredData = null) {
+  console.log("Rendering all cartoons page, current page:", currentPage);
+  const container = document.getElementById("allCartoonsContainer");
+  const dataToRender = filteredData || allCartoonsData;
+  console.log("Data to render:", dataToRender.length, "items");
+
+  const startIndex = (currentPage - 1) * cartoonsPerPage;
+  const endIndex = startIndex + cartoonsPerPage;
+  const pageCartoons = dataToRender.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(dataToRender.length / cartoonsPerPage);
+
+  console.log("Page cartoons:", pageCartoons);
+
+  container.innerHTML = "";
+
+  if (pageCartoons.length === 0) {
+    container.innerHTML = '<div class="empty-state">No cartoons found</div>';
+    document.getElementById("paginationControls").style.display = "none";
+    return;
+  }
+
+  // Show loading skeleton while fetching details
+  container.innerHTML = `
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+  `;
+
+  // Load full details for each cartoon on the page
+  Promise.all(
+    pageCartoons.map(async (cartoon) => {
+      const detailResult = await apiRequest(`/admin/cartoons/${cartoon.id}`);
+      return detailResult && detailResult.ok ? detailResult.data.data : null;
+    })
+  ).then((detailedCartoons) => {
+    console.log("Detailed cartoons:", detailedCartoons);
+    container.innerHTML = "";
+    detailedCartoons.forEach((cartoon) => {
+      if (cartoon) {
+        console.log("Creating card for cartoon:", cartoon);
+        const cartoonId = cartoon.id || cartoon.cartoon_id;
+        const isFavorited = userFavorites.has(cartoonId);
+        const card = createCartoonCard(cartoon, true, isFavorited);
+        container.appendChild(card);
+      }
+    });
+  });
+
+  // Update pagination controls
+  document.getElementById("paginationControls").style.display = "flex";
+  document.getElementById(
+    "pageInfo"
+  ).textContent = `Page ${currentPage} of ${totalPages}`;
+  document.getElementById("prevPageBtn").disabled = currentPage === 1;
+  document.getElementById("nextPageBtn").disabled = currentPage >= totalPages;
+}
+
+function changePage(direction) {
+  currentPage += direction;
+  renderAllCartoonsPage();
+  // Scroll to top of content
+  document.querySelector(".dashboard-content").scrollTop = 0;
+}
+
+// ============================================
+// LOAD FAVOURITES TAB
+// ============================================
+
+async function loadFavoritesTab() {
+  const container = document.getElementById("favoritesTabContainer");
+
+  // Show loading state
+  container.innerHTML = `
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+  `;
+
+  const result = await apiRequest("/user/favourites");
+
+  if (result && result.ok) {
+    const favorites = result.data.data || result.data || [];
+
+    // Update global favorites set
+    userFavorites.clear();
+    favorites.forEach((favorite) => {
+      const cartoonId =
+        favorite.cartoon_id || favorite.cartoon?.id || favorite.id;
+      userFavorites.add(cartoonId);
+    });
+
+    container.innerHTML = "";
+
+    if (!favorites || favorites.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state">No favorite cartoons yet ❤️<br><small>Browse cartoons and add your favorites!</small></div>';
+      return;
+    }
+
+    favorites.forEach((favorite) => {
+      const cartoon = favorite.cartoon || favorite;
+      const card = createCartoonCard(cartoon, true, true);
+      container.appendChild(card);
+    });
+  } else {
+    container.innerHTML =
+      '<div class="empty-state">Failed to load favorites</div>';
+  }
+}
+
+// ============================================
+// LOAD RECENTLY VIEWED TAB
+// ============================================
+
+async function loadRecentlyViewedTab() {
+  const container = document.getElementById("recentlyViewedTabContainer");
+
+  // Show loading state
+  container.innerHTML = `
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+  `;
+
+  const result = await apiRequest("/admin/recently-viewed");
+
+  if (result && result.ok) {
+    const recentlyViewed = result.data.data || result.data || [];
+
+    container.innerHTML = "";
+
+    if (!recentlyViewed || recentlyViewed.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state">No recently viewed cartoons<br><small>Start watching cartoons to see them here!</small></div>';
+      return;
+    }
+
+    recentlyViewed.forEach((cartoon) => {
+      const cartoonId = cartoon.id || cartoon.cartoon_id;
+      const isFavorited = userFavorites.has(cartoonId);
+      const card = createCartoonCard(cartoon, true, isFavorited);
+      container.appendChild(card);
+    });
+  } else {
+    container.innerHTML =
+      '<div class="empty-state">Failed to load recently viewed</div>';
+  }
 }

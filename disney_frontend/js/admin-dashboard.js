@@ -16,9 +16,9 @@ const state = {
   token: null,
   charactersToSave: [], // Track characters being added/edited
 
-  // Pagination (4 columns × 2 rows = 8 items per page)
+  // Pagination (5 columns × 2 rows = 10 items per page)
   currentPage: 1,
-  itemsPerPage: 8,
+  itemsPerPage: 10,
   totalPages: 1,
 };
 
@@ -356,6 +356,7 @@ function applyFilters() {
     .value.toLowerCase();
   const genreId = document.getElementById("genre-filter").value;
   const ageGroupId = document.getElementById("age-group-filter").value;
+  const featured = document.getElementById("featured-filter").value;
 
   state.filteredCartoons = state.cartoons.filter((cartoon) => {
     // Search by title
@@ -370,6 +371,11 @@ function applyFilters() {
 
     // Filter by age group
     if (ageGroupId && cartoon.age_group_id != ageGroupId) {
+      return false;
+    }
+
+    // Filter by featured status
+    if (featured !== "" && String(cartoon.is_featured) !== featured) {
       return false;
     }
 
@@ -388,6 +394,7 @@ function clearFilters() {
   document.getElementById("search-input").value = "";
   document.getElementById("genre-filter").value = "";
   document.getElementById("age-group-filter").value = "";
+  document.getElementById("featured-filter").value = "";
   applyFilters();
 }
 
@@ -514,6 +521,12 @@ async function openEditCartoonModal(cartoonId) {
   const cartoon = state.cartoons.find((c) => c.id === cartoonId);
   if (!cartoon) return;
 
+  // Close the modal first if it's already open to prevent duplication
+  const modal = document.getElementById("cartoon-modal");
+  if (!modal.classList.contains("hidden")) {
+    closeModal("cartoon-modal");
+  }
+
   state.editingCartoonId = cartoonId;
   state.charactersToSave = [];
   document.getElementById("modal-title").textContent = "Edit Cartoon";
@@ -529,16 +542,19 @@ async function openEditCartoonModal(cartoonId) {
   document.getElementById("cartoon-featured").checked =
     cartoon.is_featured || false;
 
-  // Populate existing characters
+  // Ensure characters container is completely cleared before adding new ones
   const container = document.getElementById("characters-container");
   container.innerHTML = "";
-  if (cartoon.characters && cartoon.characters.length > 0) {
-    cartoon.characters.forEach((char) => {
-      addCharacterField(char);
-    });
-  }
 
-  openModal("cartoon-modal");
+  // Small delay to ensure DOM is cleared before adding new elements
+  setTimeout(() => {
+    if (cartoon.characters && cartoon.characters.length > 0) {
+      cartoon.characters.forEach((char) => {
+        addCharacterField(char);
+      });
+    }
+    openModal("cartoon-modal");
+  }, 10);
 }
 
 /**
@@ -581,6 +597,11 @@ function openModal(modalId) {
  */
 function closeModal(modalId) {
   document.getElementById(modalId).classList.add("hidden");
+
+  // Clear characters container when closing cartoon modal to prevent duplication
+  if (modalId === "cartoon-modal") {
+    document.getElementById("characters-container").innerHTML = "";
+  }
 }
 
 // ============================================
@@ -636,7 +657,11 @@ function addCharacterField(existingCharacter = null) {
   removeBtn.type = "button";
   removeBtn.className = "btn btn-danger btn-small btn-remove";
   removeBtn.textContent = "Remove";
-  removeBtn.onclick = () => removeCharacterField(fieldId);
+  removeBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeCharacterField(fieldId);
+  };
 
   div.appendChild(nameGroup);
   div.appendChild(imageGroup);
@@ -754,6 +779,49 @@ async function handleCartoonSubmit(event) {
     // Get the cartoon ID (for new cartoons, it's in the response)
     if (!state.editingCartoonId) {
       cartoonId = data.id || data.data?.id;
+    }
+
+    // If editing, delete all existing characters first to avoid duplicates
+    if (state.editingCartoonId && cartoonId) {
+      try {
+        console.log(`Deleting existing characters for cartoon ID ${cartoonId}`);
+        const existingCharsResponse = await fetch(
+          `${API_BASE_URL}/admin/characters/cartoon/${cartoonId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${state.token}`,
+            },
+          }
+        );
+
+        if (existingCharsResponse.ok) {
+          const existingCharsData = await existingCharsResponse.json();
+          const existingCharacters = existingCharsData.characters || [];
+
+          // Delete each existing character
+          for (const existingChar of existingCharacters) {
+            try {
+              await fetch(
+                `${API_BASE_URL}/admin/characters/${existingChar.id}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${state.token}`,
+                  },
+                }
+              );
+              console.log(`Deleted character: ${existingChar.name}`);
+            } catch (deleteError) {
+              console.warn(
+                `Error deleting character ${existingChar.name}:`,
+                deleteError
+              );
+            }
+          }
+        }
+      } catch (error) {
+        console.warn("Error fetching/deleting existing characters:", error);
+      }
     }
 
     // Save characters if any
@@ -928,7 +996,9 @@ async function confirmDelete() {
 function handleLogout() {
   localStorage.removeItem("token");
   localStorage.removeItem("user-email");
-  window.location.href = "index.html";
+  localStorage.removeItem("disney_auth_token");
+  localStorage.removeItem("disney_user_data");
+  window.location.href = "./index.html";
 }
 
 // ============================================

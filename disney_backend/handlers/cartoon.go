@@ -404,6 +404,16 @@ func CreateCartoon(c *gin.Context) {
 	// Load relationships for response
 	database.DB.Preload("Genre").Preload("AgeGroup").First(&cartoon, cartoon.ID)
 
+	// Log admin action
+	if adminID, exists := c.Get("userID"); exists {
+		adminLog := models.AdminLog{
+			AdminID: adminID.(uint),
+			Action:  "CREATE",
+			Entity:  "Cartoon: " + cartoon.Title,
+		}
+		database.DB.Create(&adminLog)
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Cartoon created successfully",
 		"data":    cartoon,
@@ -449,6 +459,16 @@ func DeleteCartoon(c *gin.Context) {
 			"error":   err.Error(),
 		})
 		return
+	}
+
+	// Log admin action
+	if adminID, exists := c.Get("userID"); exists {
+		adminLog := models.AdminLog{
+			AdminID: adminID.(uint),
+			Action:  "DELETE",
+			Entity:  "Cartoon: " + cartoon.Title,
+		}
+		database.DB.Create(&adminLog)
 	}
 
 	c.JSON(http.StatusOK, gin.H{

@@ -10,10 +10,12 @@
     <!-- Top Navbar -->
     <nav class="navbar">
         <div class="navbar-left">
-            <h2 class="page-title">📊 Admin Dashboard</h2>
+            <h2 class="page-title"> Admin Dashboard</h2>
         </div>
         <div class="navbar-right">
             <div class="user-info">
+                <button class="btn btn-primary btn-small" onclick="window.location.href='./admin-logs.html'" style="margin-right: 10px;">Analytics</button>
+                <button class="btn btn-primary btn-small" onclick="window.location.href='./request-logs.html'" style="margin-right: 10px;">Request Logs</button>
                 <span id="user-email" class="user-email">User</span>
                 <button class="btn btn-secondary btn-small" onclick="handleLogout()">Logout</button>
             </div>
@@ -26,7 +28,7 @@
             <div class="section-container">
                 <div class="section-header">
                     <div class="header-left">
-                        <h1>🎬 Manage Cartoons</h1>
+                        <h1>Manage Cartoons</h1>
                     </div>
                     <button class="btn btn-primary" onclick="openAddCartoonModal()">+ Add Cartoon</button>
                 </div>
@@ -35,24 +37,22 @@
                 <div class="filters-section">
                     <div class="search-box">
                         <input type="text" id="search-input" class="search-input" placeholder="Search by title..." onkeyup="applyFilters()">
-                        <span class="search-icon">🔍</span>
+                        <span class="search-icon"></span>
                     </div>
 
                     <div class="filters-group">
                         <select id="genre-filter" class="filter-select" onchange="applyFilters()">
-                            <option value="">All Genres</option>
-                            <option value="1">Action</option>
-                            <option value="2">Comedy</option>
-                            <option value="3">Drama</option>
-                            <option value="4">Romance</option>
-                            <option value="5">Thriller</option>
-                            <option value="6">Horror</option>
-                            <option value="7">Sci-Fi</option>
-                            <option value="8">Fantasy</option>
+                            <option value="">Genre</option>
                         </select>
 
                         <select id="age-group-filter" class="filter-select" onchange="applyFilters()">
                             <option value="">Age Group</option>
+                        </select>
+
+                        <select id="featured-filter" class="filter-select" onchange="applyFilters()">
+                            <option value="">All Status</option>
+                            <option value="true">Featured</option>
+                            <option value="false">Not Featured</option>
                         </select>
 
                         <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
@@ -91,7 +91,7 @@
 
                 <!-- No Results -->
                 <div id="no-cartoons" class="no-results hidden">
-                    <p>📭 No cartoons found. Try adjusting your filters.</p>
+                    <p>No cartoons found. Try adjusting your filters.</p>
                 </div>
             </div>
         </div>

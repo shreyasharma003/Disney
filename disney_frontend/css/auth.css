@@ -15,6 +15,16 @@
   position: relative;
 }
 
+/* Light mode: make gradient transparent to show background image */
+[data-theme="light"] .auth-container {
+  background: transparent;
+}
+
+/* Dark mode: make gradient transparent to show background image */
+[data-theme="dark"] .auth-container {
+  background: transparent;
+}
+
 .auth-card {
   background: var(--card-bg);
   border: 1px solid var(--input-border);
@@ -255,5 +265,54 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+/* Doraemon Cutout */
+.doraemon-cutout {
+  position: absolute;
+  top: 50%;
+  right: calc(50% - 280px);
+  transform: translateY(-50%);
+  width: 100px;
+  height: auto;
+  opacity: 0.9;
+  z-index: 1;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(-50%);
+  }
+  50% {
+    transform: translateY(calc(-50% - 10px));
+  }
+}
+
+@media (max-width: 768px) {
+  .doraemon-cutout {
+    width: 70px;
+    right: calc(50% - 280px);
+  }
+}
+
+@media (max-width: 640px) {
+  .doraemon-cutout {
+    width: 60px;
+    top: 10px;
+    right: 10px;
+    transform: translateY(0);
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }

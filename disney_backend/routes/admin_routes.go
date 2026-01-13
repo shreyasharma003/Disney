@@ -54,5 +54,14 @@ func SetupAdminRoutes(router *gin.RouterGroup) {
 		admin.GET("/characters/cartoon/:cartoon_id", handlers.GetCharactersByCartoon)
 		admin.PUT("/characters/:id", handlers.UpdateCharacter)
 		admin.DELETE("/characters/:id", handlers.DeleteCharacter)
+
+		// Admin logs management
+		admin.POST("/logs", handlers.CreateAdminLog)
+		admin.GET("/logs", handlers.GetAdminLogs)
+		admin.GET("/logs/stats", handlers.GetAdminLogStats)
+
+		// Request logs management
+		admin.GET("/request-logs", handlers.GetRequestLogs)
+		admin.GET("/request-logs/stats", handlers.GetRequestLogStats)
 	}
 }

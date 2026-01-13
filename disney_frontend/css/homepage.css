@@ -1,126 +1,67 @@
-/* ============================================
-   NETFLIX-STYLE POSTER GRID BACKGROUND
-   Clean, Cinematic, Organized
-   ============================================ */
-
-/* === POSTER GRID CONTAINER === */
-.poster-grid-container {
-  position: fixed;
-  top: -10%;
-  left: -10%;
-  width: 120%;
-  height: 120%;
-  z-index: -1;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0f3460 100%);
+/* === BODY & HTML === */
+html,
+body {
+  width: 100%;
+  height: 100vh;
   overflow: hidden;
-}
-
-/* Grid with rotation */
-.poster-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-  padding: 40px;
-  transform: rotate(-6deg) scale(1.1);
-  width: 100%;
-  height: 100%;
-}
-
-/* Uniform Poster Tiles */
-.poster {
-  aspect-ratio: 2 / 3;
-  overflow: hidden;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.poster img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: all 0.3s ease;
-  filter: brightness(0.7);
-}
-
-/* Hover Effect - Brightness Boost */
-.poster:hover img {
-  filter: brightness(1.1);
-  transform: scale(1.05);
-}
-
-/* Dark Overlay for Depth */
-.grid-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(0, 0, 0, 0.3) 0%,
-    rgba(0, 0, 0, 0.7) 100%
-  );
-  pointer-events: none;
+  background: url("../src/disney-hero.png") no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
 }
 
 /* === MAIN CONTENT === */
 .main-content {
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 80px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Auth Wrapper Container */
+.auth-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 80px 20px 40px;
-  position: relative;
-  z-index: 1;
-}
-
-/* Hero Text */
-.hero-title {
-  font-size: 72px;
-  font-weight: 900;
-  color: #fff;
-  text-align: center;
-  margin-bottom: 16px;
-  text-shadow: 0 4px 20px rgba(255, 107, 107, 0.6),
-    0 2px 10px rgba(0, 0, 0, 0.8);
-  letter-spacing: -2px;
-  animation: bounceIn 1s ease;
-}
-
-.hero-subtitle {
-  font-size: 28px;
-  color: #ffd700;
-  text-align: center;
-  margin-bottom: 60px;
-  font-weight: 600;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-  animation: fadeIn 1.2s ease 0.3s both;
-}
-
-/* === GLASS CARDS === */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 32px;
-  max-width: 850px;
+  max-width: 420px;
   width: 100%;
   animation: slideUp 1s ease 0.5s both;
 }
 
+/* Disney Logo */
+.disney-logo {
+  height: clamp(120px, 18vh, 180px);
+  width: auto;
+  margin-bottom: 24px;
+  animation: fadeIn 1s ease;
+  filter: brightness(0);
+}
+
+/* Hero Text */
+.hero-title {
+  display: none;
+}
+
+.hero-subtitle {
+  display: none;
+}
+
+/* === GLASS CARD === */
 .glass-card {
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #ca94c3;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
-  padding: 40px 32px;
+  padding: clamp(24px, 4.5vh, 35px) clamp(16px, 2.5vw, 24px);
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
+  width: 100%;
 }
 
 .glass-card::before {
@@ -132,8 +73,8 @@
   height: 100%;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.03) 50%,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
     transparent 100%
   );
   opacity: 1;
@@ -144,8 +85,8 @@
 .glass-card:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3);
-  background: rgba(0, 0, 0, 0.35);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: #ca94c3;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .glass-card:hover::before {
@@ -154,33 +95,34 @@
 
 /* Card Content */
 .card-title {
-  font-size: 32px;
+  font-size: clamp(1.2rem, 3vh, 1.6rem);
   font-weight: 800;
   color: #fff;
-  margin-bottom: 12px;
+  margin-bottom: clamp(6px, 1vh, 10px);
   text-transform: uppercase;
   letter-spacing: 1px;
+  text-align: center;
 }
 
 .card-desc {
-  font-size: 15px;
+  font-size: clamp(0.8rem, 1.3vw, 0.9rem);
   color: rgba(255, 255, 255, 0.85);
-  line-height: 1.6;
-  margin-bottom: 24px;
+  line-height: 1.4;
+  margin-bottom: clamp(12px, 1.8vh, 16px);
 }
 
 .features-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 28px 0;
+  margin: 0 0 clamp(10px, 1.5vh, 14px) 0;
 }
 
 .features-list li {
   background: rgba(255, 255, 255, 0.15);
-  padding: 12px 18px;
+  padding: clamp(6px, 0.8vh, 10px) clamp(10px, 1.5vw, 14px);
   border-radius: 10px;
-  margin-bottom: 10px;
-  font-size: 15px;
+  margin-bottom: clamp(4px, 0.8vh, 6px);
+  font-size: clamp(0.7rem, 1vw, 0.8rem);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
@@ -200,9 +142,9 @@
 .btn-primary,
 .btn-outline {
   flex: 1;
-  padding: 14px 24px;
+  padding: clamp(8px, 1.2vh, 12px) clamp(12px, 1.8vw, 16px);
   border-radius: 12px;
-  font-size: 15px;
+  font-size: clamp(0.65rem, 1vw, 0.8rem);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -274,33 +216,62 @@
   }
 }
 
+/* === ADMIN LOGIN LINK === */
+.admin-link-container {
+  margin-top: 16px;
+  text-align: center;
+  animation: fadeIn 1.5s ease 0.8s both;
+  width: 100%;
+}
+
+.admin-login-link {
+  font-size: clamp(0.7rem, 1vw, 0.85rem);
+  color: #000000;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+
+.admin-login-link:hover {
+  color: #333333;
+  border-bottom: 1px solid #333333;
+}
+
+.admin-login-link:active {
+  color: #1a1a1a;
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 48px;
+  html,
+  body {
+    overflow: hidden;
+    height: 100vh;
   }
 
-  .hero-subtitle {
-    font-size: 20px;
-    margin-bottom: 40px;
+  .main-content {
+    height: 100vh;
+    width: 100vw;
+    padding: 20px;
+    justify-content: center;
   }
 
-  .cards-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 0 16px;
+  .auth-wrapper {
+    max-width: 100%;
+  }
+
+  .disney-logo {
+    height: clamp(60px, 10vh, 100px);
+    margin-bottom: 16px;
   }
 
   .glass-card {
-    padding: 28px 20px;
+    padding: 20px 16px;
   }
 
   .card-buttons {
     flex-direction: column;
-  }
-
-  /* Simplify floating cutouts on mobile */
-  .floating-cutout {
-    width: 100px;
   }
 }

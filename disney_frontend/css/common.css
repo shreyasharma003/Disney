@@ -48,6 +48,24 @@
   --hover-bg: #21262d;
 }
 
+/* Dark Theme Background Image */
+[data-theme="dark"] body:not(.homepage-body) {
+  background-image: url("../src/dark-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Light Theme Background Image */
+[data-theme="light"] body:not(.homepage-body) {
+  background-image: url("../src/light-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;

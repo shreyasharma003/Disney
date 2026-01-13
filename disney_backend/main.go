@@ -4,6 +4,7 @@ import (
 	"disney/config"
 	"disney/database"
 	"disney/handlers"
+	"disney/middleware"
 	"disney/routes"
 	"disney/services"
 	"disney/workers"
@@ -50,6 +51,9 @@ func main() {
 	corsConfig.ExposeHeaders = []string{"Content-Length"}
 	corsConfig.AllowCredentials = false
 	router.Use(cors.New(corsConfig))
+
+	// Add request logger middleware to log all requests
+	router.Use(middleware.RequestLogger())
 
 	// Public Auth routes (no authentication required)
 	auth := router.Group("/api/auth")

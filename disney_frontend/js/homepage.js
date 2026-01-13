@@ -18,3 +18,9 @@ window.navigateToLogin = function (role) {
     window.location.href = "admin-login.html";
   }
 };
+
+window.navigateToAdminLogin = function (event) {
+  event.preventDefault();
+  console.log("Navigate to admin login");
+  window.location.href = "admin-login.html";
+};

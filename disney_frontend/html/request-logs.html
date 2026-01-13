@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request Logs - Disney</title>
+    <link rel="stylesheet" href="../css/admin-logs.css" />
+  </head>
+  <body>
+    <!-- Top Navbar -->
+    <nav class="navbar">
+      <div class="navbar-left">
+        <h2 class="page-title">Request Logs</h2>
+      </div>
+      <div class="navbar-right">
+        <div class="user-info">
+          <span id="user-email" class="user-email">User</span>
+          <button class="btn btn-secondary btn-small" onclick="handleLogout()">
+            Logout
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Content Area -->
+    <div class="main-content">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="header-left">
+            <h1></h1>
+            <p class="subtitle"></p>
+          </div>
+          <button class="btn btn-secondary" onclick="goBack()">
+            ← Back to Dashboard
+          </button>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+          <div class="filter-group">
+            <label>HTTP Method:</label>
+            <select
+              id="method-filter"
+              class="filter-select"
+              onchange="applyFilters()"
+            >
+              <option value="">All Methods</option>
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Status Code:</label>
+            <select
+              id="status-filter"
+              class="filter-select"
+              onchange="applyFilters()"
+            >
+              <option value="">All Status</option>
+              <option value="2xx">2xx Success</option>
+              <option value="4xx">4xx Client Error</option>
+              <option value="5xx">5xx Server Error</option>
+            </select>
+          </div>
+
+          <div class="filter-group" style="flex: 2">
+            <label>Date Range:</label>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <input
+                type="date"
+                id="date-from"
+                class="filter-input"
+                onchange="applyFilters()"
+                style="flex: 1"
+              />
+              <span style="white-space: nowrap">to</span>
+              <input
+                type="date"
+                id="date-to"
+                class="filter-input"
+                onchange="applyFilters()"
+                style="flex: 1"
+              />
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: flex-end">
+            <button class="btn btn-secondary" onclick="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-section">
+          <div class="stat-card">
+            <div class="stat-number" id="total-requests">0</div>
+            <div class="stat-label">Total Requests</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="success-count">0</div>
+            <div class="stat-label">Success (2xx)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="client-error-count">0</div>
+            <div class="stat-label">Client Errors (4xx)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="server-error-count">0</div>
+            <div class="stat-label">Server Errors (5xx)</div>
+          </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="logs-loading" class="loading hidden">
+          <div class="spinner"></div>
+          <p>Loading request logs...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="logs-error" class="error-message hidden"></div>
+
+        <!-- Logs Table -->
+        <div class="logs-table-container">
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>User</th>
+                <th>Status</th>
+                <th>Date & Time</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody">
+              <!-- Logs will be populated here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- No Logs Message -->
+        <div id="no-logs" class="no-results hidden">
+          <p>No request logs found.</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/request-logs.js"></script>
+  </body>
+</html>
