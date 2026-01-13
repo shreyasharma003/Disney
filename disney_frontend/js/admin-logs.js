@@ -1,6 +1,14 @@
 // Admin Logs & Analytics JavaScript
 
-// API_BASE_URL is defined in config.js which uses API_BASE from docker_config.js
+// Ensure API_BASE_URL is available
+let API_BASE_URL;
+if (typeof window.API_BASE_URL !== 'undefined') {
+  API_BASE_URL = window.API_BASE_URL;
+} else if (typeof API_BASE !== 'undefined') {
+  API_BASE_URL = `${API_BASE}/api`;
+} else {
+  API_BASE_URL = "http://localhost:8080/api";
+}
 
 // State Management
 const state = {
@@ -68,8 +76,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
 /**
  * Load all admin logs from backend
- * Note: Backend endpoint would be /api/admin/logs
- * Since it doesn't exist yet, we'll make a POST request to log actions
  */
 async function loadAdminLogs() {
   const logsLoading = document.getElementById("logs-loading");
@@ -77,6 +83,8 @@ async function loadAdminLogs() {
   const logsTable = document.getElementById("logs-tbody");
   const noLogs = document.getElementById("no-logs");
 
+  console.log("Loading admin logs from:", `${API_BASE_URL}/admin/logs`);
+  
   logsLoading.classList.remove("hidden");
   logsError.classList.add("hidden");
   noLogs.classList.add("hidden");
@@ -92,29 +100,49 @@ async function loadAdminLogs() {
     });
 
     console.log("Admin logs response status:", response.status);
-    console.log("Admin logs response:", response);
+    console.log("Admin logs response headers:", response.headers);
 
     let logs = [];
 
     if (response.ok) {
       const data = await response.json();
-      console.log("Admin logs data:", data);
-      logs = data.data || [];
-    } else if (response.status === 404) {
-      // If endpoint doesn't exist, load from localStorage as fallback
-      console.log("Logs endpoint returned 404, falling back to localStorage");
-      const storedLogs = localStorage.getItem("admin_logs");
-      logs = storedLogs ? JSON.parse(storedLogs) : [];
+      console.log("Admin logs response data:", data);
+      
+      // Handle both direct array and nested data structure
+      if (data.data && Array.isArray(data.data)) {
+        logs = data.data;
+      } else if (Array.isArray(data)) {
+        logs = data;
+      } else {
+        console.warn("Unexpected data structure:", data);
+        logs = [];
+      }
+      
+      console.log(`Successfully loaded ${logs.length} admin logs:`, logs);
     } else {
-      throw new Error(`Failed to fetch logs: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error(`Failed to fetch logs: ${response.status} ${response.statusText}`, errorText);
+      
+      if (response.status === 404) {
+        console.log("Logs endpoint returned 404, trying localStorage fallback");
+      } else if (response.status === 401) {
+        console.error("Unauthorized - token might be invalid");
+        alert("Session expired. Please log in again.");
+        window.location.href = "./admin-login.html";
+        return;
+      } else {
+        throw new Error(`Failed to fetch logs: ${response.status} ${response.statusText}`);
+      }
     }
 
-    console.log("Logs loaded:", logs);
     state.logs = logs;
     state.filteredLogs = logs;
 
     // Calculate statistics
     calculateStats();
+
+    // Load and display stats
+    await loadAdminLogStats();
 
     // Render logs
     renderLogs();
@@ -128,19 +156,9 @@ async function loadAdminLogs() {
     console.error("Error loading logs:", error);
     logsLoading.classList.add("hidden");
 
-    // Fallback to localStorage
-    const storedLogs = localStorage.getItem("admin_logs");
-    state.logs = storedLogs ? JSON.parse(storedLogs) : [];
-    state.filteredLogs = state.logs;
-
-    if (state.logs.length > 0) {
-      console.log("Using localStorage logs:", state.logs);
-      calculateStats();
-      renderLogs();
-    } else {
-      logsError.textContent = "Failed to load admin logs. No data available.";
-      logsError.classList.remove("hidden");
-    }
+    // Show error message
+    logsError.textContent = `Failed to load admin logs: ${error.message}`;
+    logsError.classList.remove("hidden");
   }
 }
 
@@ -149,18 +167,17 @@ async function loadAdminLogs() {
  */
 async function logAdminAction(action, entity, details = "") {
   try {
+    // Backend expects action and entity in request body
     const logData = {
-      admin_id: state.userId,
       action: action,
-      entity: entity,
-      details: details,
-      timestamp: new Date().toISOString(),
+      entity: entity
     };
 
-    // Try to send to backend
-    // This assumes backend has POST /api/admin/logs endpoint
+    console.log("Logging admin action:", logData);
+
+    // Send to backend
     try {
-      await fetch(`${API_BASE_URL}/admin/logs`, {
+      const response = await fetch(`${API_BASE_URL}/admin/logs`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${state.token}`,
@@ -168,15 +185,21 @@ async function logAdminAction(action, entity, details = "") {
         },
         body: JSON.stringify(logData),
       });
+
+      if (response.ok) {
+        console.log("Admin action logged successfully");
+      } else {
+        const errorText = await response.text();
+        console.warn("Failed to log to backend:", response.status, errorText);
+      }
     } catch (error) {
       console.warn("Could not send log to backend:", error);
     }
 
-    // Also save to localStorage as fallback
-    const logs = state.logs || [];
-    logs.unshift(logData); // Add to beginning (newest first)
-    state.logs = logs;
-    localStorage.setItem("admin_logs", JSON.stringify(logs));
+    // Refresh logs to show the new entry
+    setTimeout(() => {
+      loadAdminLogs();
+    }, 500);
   } catch (error) {
     console.error("Error logging action:", error);
   }
@@ -192,6 +215,8 @@ async function logAdminAction(action, entity, details = "") {
 function renderLogs() {
   const logsTable = document.getElementById("logs-tbody");
   const noLogs = document.getElementById("no-logs");
+
+  console.log("Rendering logs:", state.filteredLogs);
 
   if (state.filteredLogs.length === 0) {
     logsTable.innerHTML =
@@ -219,24 +244,30 @@ function renderLogs() {
       // Handle both backend response format and localStorage format
       let adminName = "Unknown Admin";
       if (log.admin) {
-        if (typeof log.admin === "object" && log.admin.email) {
-          adminName = log.admin.email;
+        if (typeof log.admin === "object") {
+          adminName = log.admin.email || log.admin.name || `Admin #${log.admin.id}`;
         } else if (typeof log.admin === "string") {
           adminName = log.admin;
         }
+      } else if (log.admin_id) {
+        adminName = `Admin #${log.admin_id}`;
       }
 
+      console.log(`Rendering log ${log.id}: admin=${JSON.stringify(log.admin)}, action=${log.action}, entity=${log.entity}`);
+
       return `
-            <tr>
-                <td>${log.id}</td>
-                <td>${adminName}</td>
-                <td><span class="action-badge ${actionClass}">${log.action}</span></td>
-                <td><span class="entity-badge">${log.entity}</span></td>
-                <td>${formattedDate}</td>
-            </tr>
-        `;
+        <tr class="log-row">
+          <td class="admin-name">${adminName}</td>
+          <td class="action ${actionClass}">${log.action}</td>
+          <td class="entity">${log.entity}</td>
+          <td class="timestamp">${formattedDate}</td>
+          <td class="details">${log.details || '-'}</td>
+        </tr>
+      `;
     })
     .join("");
+
+  console.log(`Rendered ${state.filteredLogs.length} log entries to table`);
 }
 
 // ============================================
@@ -321,6 +352,40 @@ function calculateStats() {
   document.getElementById("create-count").textContent = state.stats.create;
   document.getElementById("update-count").textContent = state.stats.update;
   document.getElementById("delete-count").textContent = state.stats.delete;
+}
+
+/**
+ * Load admin log statistics from backend
+ */
+async function loadAdminLogStats() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/logs/stats`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${state.token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Admin log stats:", data);
+      
+      const stats = data.data || {};
+      
+      // Update UI with backend stats if available
+      if (stats.total_logs !== undefined) {
+        document.getElementById("total-logs").textContent = stats.total_logs;
+        document.getElementById("create-count").textContent = stats.create_count || 0;
+        document.getElementById("update-count").textContent = stats.update_count || 0;
+        document.getElementById("delete-count").textContent = stats.delete_count || 0;
+      }
+    } else {
+      console.warn("Failed to load stats from backend, using calculated stats");
+    }
+  } catch (error) {
+    console.warn("Error loading stats from backend:", error);
+  }
 }
 
 // ============================================

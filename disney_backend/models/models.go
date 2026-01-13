@@ -6,7 +6,7 @@ import (
 
 // User Table
 type User struct {
-	ID           uint      `gorm:"primaryKey" json:"id"`
+	ID           uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	Name         string    `gorm:"type:varchar(255);not null" json:"name"`
 	Email        string    `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
 	PasswordHash string    `gorm:"type:varchar(255);not null" json:"-"`                  // excluded from JSON
@@ -23,7 +23,7 @@ func (User) TableName() string {
 
 // Genre Table
 type Genre struct {
-	ID   uint   `gorm:"primaryKey" json:"id"`
+	ID   uint   `gorm:"primaryKey;autoIncrement" json:"id"`
 	Name string `gorm:"type:varchar(100);not null;uniqueIndex" json:"name"`
 }
 
@@ -34,7 +34,7 @@ func (Genre) TableName() string {
 
 // AgeGroup Table
 type AgeGroup struct {
-	ID    uint   `gorm:"primaryKey" json:"id"`
+	ID    uint   `gorm:"primaryKey;autoIncrement" json:"id"`
 	Label string `gorm:"type:varchar(50);not null;uniqueIndex" json:"label"`
 }
 
@@ -45,7 +45,7 @@ func (AgeGroup) TableName() string {
 
 // Cartoon Table
 type Cartoon struct {
-	ID          uint      `gorm:"primaryKey" json:"id"`
+	ID          uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	Title       string    `gorm:"type:varchar(255);not null;index" json:"title"`
 	Description string    `gorm:"type:text" json:"description"`
 	PosterURL   string    `gorm:"type:varchar(500)" json:"poster_url"`
@@ -57,8 +57,8 @@ type Cartoon struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 
 	// Foreign key relationships
-	Genre    Genre    `gorm:"foreignKey:GenreID;constraint:OnDelete:RESTRICT" json:"genre,omitempty"`
-	AgeGroup AgeGroup `gorm:"foreignKey:AgeGroupID;constraint:OnDelete:RESTRICT" json:"age_group,omitempty"`
+	Genre      Genre       `gorm:"foreignKey:GenreID;constraint:OnDelete:RESTRICT" json:"genre,omitempty"`
+	AgeGroup   AgeGroup    `gorm:"foreignKey:AgeGroupID;constraint:OnDelete:RESTRICT" json:"age_group,omitempty"`
 	Characters []Character `gorm:"foreignKey:CartoonID;constraint:OnDelete:CASCADE" json:"characters,omitempty"`
 }
 
@@ -69,7 +69,7 @@ func (Cartoon) TableName() string {
 
 // Character Table
 type Character struct {
-	ID        uint   `gorm:"primaryKey" json:"id"`
+	ID        uint   `gorm:"primaryKey;autoIncrement" json:"id"`
 	Name      string `gorm:"type:varchar(255);not null;index" json:"name"`
 	ImageURL  string `gorm:"type:varchar(500)" json:"image_url"`
 	CartoonID uint   `gorm:"not null;index" json:"cartoon_id"`
@@ -85,7 +85,7 @@ func (Character) TableName() string {
 
 // Rating Table
 type Rating struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	UserID    uint      `gorm:"not null;index:idx_user_cartoon" json:"user_id"`
 	CartoonID uint      `gorm:"not null;index:idx_user_cartoon" json:"cartoon_id"`
 	Rating    int       `gorm:"type:int;not null;check:rating >= 1 AND rating <= 10" json:"rating"`
@@ -103,7 +103,7 @@ func (Rating) TableName() string {
 
 // Favourite Table
 type Favourite struct {
-	ID        uint `gorm:"primaryKey" json:"id"`
+	ID        uint `gorm:"primaryKey;autoIncrement" json:"id"`
 	UserID    uint `gorm:"not null;uniqueIndex:idx_user_cartoon_fav" json:"user_id"`
 	CartoonID uint `gorm:"not null;uniqueIndex:idx_user_cartoon_fav" json:"cartoon_id"`
 
@@ -119,7 +119,7 @@ func (Favourite) TableName() string {
 
 // View Table (analytics)
 type View struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	CartoonID uint      `gorm:"not null;index" json:"cartoon_id"`
 	UserID    *uint     `gorm:"index" json:"user_id,omitempty"` // nullable
 	ViewedAt  time.Time `gorm:"not null;index" json:"viewed_at"`
@@ -136,7 +136,7 @@ func (View) TableName() string {
 
 // AdminLog Table
 type AdminLog struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	AdminID   uint      `gorm:"not null;index" json:"admin_id"`
 	Action    string    `gorm:"type:varchar(255);not null" json:"action"`
 	Entity    string    `gorm:"type:varchar(255);not null" json:"entity"`
@@ -172,7 +172,7 @@ func (RequestLog) TableName() string {
 
 // TimeTable Table (Show Schedule)
 type TimeTable struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	CartoonID uint      `gorm:"not null;index" json:"cartoon_id"`
 	ShowTime  time.Time `gorm:"not null;index" json:"show_time"`
 	DayOfWeek string    `gorm:"type:varchar(20);not null" json:"day_of_week"` // Monday, Tuesday, etc.

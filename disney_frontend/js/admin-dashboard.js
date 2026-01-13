@@ -2,7 +2,12 @@
 // ADMIN DASHBOARD - JAVASCRIPT
 // ============================================
 
-// API_BASE_URL is defined in config.js which uses API_BASE from docker_config.js
+// Ensure API_BASE_URL is available
+if (typeof API_BASE_URL === 'undefined') {
+  // Fallback if config.js hasn't loaded yet or API_BASE isn't available
+  const API_BASE_URL = typeof API_BASE !== 'undefined' ? `${API_BASE}/api` : "http://localhost:8080/api";
+  window.API_BASE_URL = API_BASE_URL;
+}
 
 // State Management
 const state = {
@@ -1043,13 +1048,18 @@ function showSuccess(message) {
  */
 function showError(message) {
   const element = document.getElementById("error-alert");
-  document.getElementById("error-text").textContent = message;
+  const textEl = document.getElementById("error-text");
+
+  if (!element || !textEl) return;
+
+  textEl.textContent = message;
   element.classList.remove("hidden");
 
   setTimeout(() => {
     element.classList.add("hidden");
   }, 4000);
 }
+
 
 /**
  * Show error in specific section
@@ -1067,4 +1077,4 @@ function showErrorMessage(message, elementId) {
 // ============================================
 
 console.log("Admin Dashboard Loaded");
-console.log("API Base URL:", API_BASE_URL);
+console.log("API Base URL:", typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'Not defined yet');

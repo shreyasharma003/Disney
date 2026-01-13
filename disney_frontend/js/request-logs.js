@@ -1,6 +1,11 @@
 // Request Logs JavaScript
 
-// API_BASE_URL is defined in config.js which uses API_BASE from docker_config.js
+// Ensure API_BASE_URL is available
+if (typeof API_BASE_URL === 'undefined') {
+  // Fallback if config.js hasn't loaded yet or API_BASE isn't available
+  const API_BASE_URL = typeof API_BASE !== 'undefined' ? `${API_BASE}/api` : "http://localhost:8080/api";
+  window.API_BASE_URL = API_BASE_URL;
+}
 
 // State Management
 const state = {

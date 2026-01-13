@@ -153,7 +153,7 @@ async function loadTrending() {
 // ============================================
 
 async function loadFavorites() {
-  const container = document.getElementById("favoritesContainer");
+  const container = document.getElementById("favoritesTabContainer");
   const result = await apiRequest("/user/favourites");
 
   if (result && result.ok) {
@@ -193,7 +193,7 @@ async function loadFavorites() {
 
 async function loadRecentlyViewed() {
   console.log("Loading recently viewed...");
-  const container = document.getElementById("recentlyViewedContainer");
+  const container = document.getElementById("recentlyViewedTabContainer");
   const result = await apiRequest("/admin/recently-viewed");
 
   console.log("Recently viewed API response:", result);
@@ -296,23 +296,44 @@ async function toggleFavorite(event, cartoonId) {
       updateAllFavoriteButtons(cartoonId, false);
 
       showToast("Removed from favorites", "success");
-      loadFavorites(); // Refresh favorites section
+      
+      // Refresh favorites tab if currently active (with delay for async processing)
+      const favoritesTab = document.querySelector('[data-tab="favourites"]');
+      if (favoritesTab && favoritesTab.classList.contains('active')) {
+        // Wait a bit for the async worker to process the request
+        setTimeout(() => {
+          loadFavoritesTab();
+        }, 1000);
+      }
     }
   } else {
     // Add to favorites
+    console.log("Adding to favorites, cartoon ID:", cartoonId);
     const result = await apiRequest("/user/favourites", {
       method: "POST",
       body: JSON.stringify({ cartoon_id: cartoonId }),
     });
 
+    console.log("Add favorite result:", result);
+
     if (result && (result.ok || result.status === 202)) {
       userFavorites.add(cartoonId); // Update global set
+      console.log("Updated userFavorites set:", userFavorites);
 
       // Update ALL favorite buttons for this cartoon across all sections
       updateAllFavoriteButtons(cartoonId, true);
 
       showToast("Added to favorites", "success");
-      loadFavorites(); // Refresh favorites section
+      
+      // Refresh favorites tab if currently active (with retry logic for async processing)
+      const favoritesTab = document.querySelector('[data-tab="favourites"]');
+      if (favoritesTab && favoritesTab.classList.contains('active')) {
+        // Try to reload favorites with retries
+        retryLoadFavorites(cartoonId, 3);
+      }
+    } else {
+      console.error("Failed to add favorite:", result);
+      showToast("Failed to add to favorites", "error");
     }
   }
 }
@@ -777,6 +798,7 @@ function changePage(direction) {
 // ============================================
 
 async function loadFavoritesTab() {
+  console.log("Loading favorites tab...");
   const container = document.getElementById("favoritesTabContainer");
 
   // Show loading state
@@ -787,9 +809,11 @@ async function loadFavoritesTab() {
   `;
 
   const result = await apiRequest("/user/favourites");
+  console.log("Favorites API response:", result);
 
   if (result && result.ok) {
     const favorites = result.data.data || result.data || [];
+    console.log("Favorites data:", favorites);
 
     // Update global favorites set
     userFavorites.clear();
@@ -809,13 +833,82 @@ async function loadFavoritesTab() {
 
     favorites.forEach((favorite) => {
       const cartoon = favorite.cartoon || favorite;
-      const card = createCartoonCard(cartoon, true, true);
-      container.appendChild(card);
+      console.log("Processing favorite:", favorite);
+      console.log("Cartoon data:", cartoon);
+      
+      if (cartoon && cartoon.id) {
+        const card = createCartoonCard(cartoon, true, true);
+        container.appendChild(card);
+      } else {
+        console.error("Invalid cartoon data:", cartoon);
+      }
     });
+    
+    console.log("Favorites tab populated with", favorites.length, "items");
   } else {
     container.innerHTML =
       '<div class="empty-state">Failed to load favorites</div>';
   }
+}
+
+// ============================================
+// DEBUG FUNCTIONS (for testing)
+// ============================================
+
+// Test function to manually check favorites API
+async function testFavoritesAPI() {
+  console.log("=== TESTING FAVORITES API ===");
+  
+  // Test GET favorites
+  const getFavs = await apiRequest("/user/favourites");
+  console.log("GET /user/favourites response:", getFavs);
+  
+  // Test POST favorite (add cartoon ID 1)
+  const addFav = await apiRequest("/user/favourites", {
+    method: "POST",
+    body: JSON.stringify({ cartoon_id: 1 }),
+  });
+  console.log("POST /user/favourites response:", addFav);
+  
+  // Wait 2 seconds and check again
+  setTimeout(async () => {
+    const getFavsAgain = await apiRequest("/user/favourites");
+    console.log("GET /user/favourites after 2s:", getFavsAgain);
+  }, 2000);
+}
+
+// Make it available globally for console testing
+window.testFavoritesAPI = testFavoritesAPI;
+
+// Retry loading favorites until the added item appears
+async function retryLoadFavorites(expectedCartoonId, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    console.log(`Retry ${i + 1}: Loading favorites...`);
+    
+    // Wait before checking
+    await new Promise(resolve => setTimeout(resolve, 1000 + (i * 500)));
+    
+    const result = await apiRequest("/user/favourites");
+    if (result && result.ok) {
+      const favorites = result.data.data || result.data || [];
+      console.log(`Retry ${i + 1}: Found ${favorites.length} favorites`);
+      
+      // Check if our expected cartoon is in the list
+      const found = favorites.some(fav => {
+        const cartoonId = fav.cartoon_id || fav.cartoon?.id || fav.id;
+        return cartoonId == expectedCartoonId;
+      });
+      
+      if (found || favorites.length > 0) {
+        console.log("Favorites found! Refreshing tab...");
+        loadFavoritesTab();
+        return;
+      }
+    }
+  }
+  
+  console.log("Max retries reached, forcing refresh anyway...");
+  loadFavoritesTab();
 }
 
 // ============================================

@@ -39,6 +39,16 @@ func CreateCharacter(c *gin.Context) {
 		return
 	}
 
+	// Log admin action
+	if adminID, exists := c.Get("userID"); exists {
+		adminLog := models.AdminLog{
+			AdminID: adminID.(uint),
+			Action:  "CREATE",
+			Entity:  "Character: " + character.Name,
+		}
+		database.DB.Create(&adminLog)
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"id":         character.ID,
 		"name":       character.Name,
@@ -91,6 +101,16 @@ func UpdateCharacter(c *gin.Context) {
 		return
 	}
 
+	// Log admin action
+	if adminID, exists := c.Get("userID"); exists {
+		adminLog := models.AdminLog{
+			AdminID: adminID.(uint),
+			Action:  "UPDATE",
+			Entity:  "Character: " + character.Name,
+		}
+		database.DB.Create(&adminLog)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "Character updated successfully",
 		"character": character,
@@ -101,9 +121,26 @@ func UpdateCharacter(c *gin.Context) {
 func DeleteCharacter(c *gin.Context) {
 	characterID := c.Param("id")
 
+	// First, get the character name for logging
+	var character models.Character
+	if err := database.DB.First(&character, characterID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Character not found"})
+		return
+	}
+
 	if err := database.DB.Delete(&models.Character{}, characterID).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to delete character"})
 		return
+	}
+
+	// Log admin action
+	if adminID, exists := c.Get("userID"); exists {
+		adminLog := models.AdminLog{
+			AdminID: adminID.(uint),
+			Action:  "DELETE",
+			Entity:  "Character: " + character.Name,
+		}
+		database.DB.Create(&adminLog)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Character deleted successfully"})
