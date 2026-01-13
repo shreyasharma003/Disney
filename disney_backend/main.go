@@ -9,14 +9,26 @@ import (
 	"disney/services"
 	"disney/workers"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
+// loadEnv loads .env file only in local development
+func loadEnv() {
+	if os.Getenv("RENDER") == "" {
+		// local development only
+		if err := godotenv.Load(); err != nil {
+			log.Println("No .env file found, using system env")
+		}
+	}
+}
+
 func main() {
-	godotenv.Load()
+	loadEnv()
 
 	// Initialize database
 	database.InitDB()
@@ -65,14 +77,22 @@ func main() {
 
 	// User routes with middleware
 	routes.UserRoutes(router)
-	// Admin routes (protected)
+	// Setup routes
 	adminGroup := router.Group("/api/admin")
 	routes.SetupAdminRoutes(adminGroup)
 
-	port := ":8080"
-	fmt.Println("Server running on port", port)
+	// Get port from environment (Render uses PORT, local uses SERVER_PORT or defaults to 8080)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = os.Getenv("SERVER_PORT")
+		if port == "" {
+			port = "8080"
+		}
+	}
+
+	fmt.Printf("Server running on port %s\n", port)
 	fmt.Println("View worker pool: 5 workers, buffer: 100")
 	fmt.Println("Favourite worker pool: 5 workers, buffer: 100")
-	router.Run(port)
+	router.Run("0.0.0.0:" + port)
 
 }

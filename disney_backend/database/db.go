@@ -12,22 +12,37 @@ import (
 	"gorm.io/gorm"
 )
 
+// loadEnv loads .env file only in local development
+func loadEnv() {
+	if os.Getenv("RENDER") == "" {
+		// local development only
+		if err := godotenv.Load(); err != nil {
+			log.Println("No .env file found, using system env")
+		}
+	}
+}
+
 var DB *gorm.DB
 
 func InitDB() {
-	// Load .env file
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
+	// Load .env file only in local development
+	loadEnv()
+
+	// Get SSL mode (default to disable for local, require for production)
+	sslMode := os.Getenv("DB_SSLMODE")
+	if sslMode == "" {
+		sslMode = "disable"
 	}
 
 	// Build DSN from env variables
 	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 		os.Getenv("DB_PORT"),
+		sslMode,
 	)
 
 	// db connection
