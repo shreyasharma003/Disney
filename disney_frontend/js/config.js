@@ -1,6 +1,6 @@
 // API Configuration - uses API_BASE from docker_config.js
-// Falls back to localhost for development if docker_config.js is not loaded
-const API_BASE_URL = typeof API_BASE !== 'undefined' ? `${API_BASE}/api` : "http://localhost:8080/api";
+// Falls back to deployed backend for production
+const API_BASE_URL = typeof API_BASE !== 'undefined' ? `${API_BASE}/api` : "https://disney-79c7.onrender.com/api";
 
 const API_ENDPOINTS = {
   // Auth endpoints

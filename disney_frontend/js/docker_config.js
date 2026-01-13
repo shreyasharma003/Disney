@@ -1,3 +1,3 @@
-// Docker Configuration
-// API Base URL for Docker container communication
-const API_BASE = "http://localhost:8080";
+// Production Configuration
+// API Base URL for deployed backend
+const API_BASE = "https://disney-79c7.onrender.com";

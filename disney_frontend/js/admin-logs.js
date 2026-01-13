@@ -7,7 +7,7 @@ if (typeof window.API_BASE_URL !== 'undefined') {
 } else if (typeof API_BASE !== 'undefined') {
   API_BASE_URL = `${API_BASE}/api`;
 } else {
-  API_BASE_URL = "http://localhost:8080/api";
+  API_BASE_URL = "https://disney-79c7.onrender.com/api";
 }
 
 // State Management
