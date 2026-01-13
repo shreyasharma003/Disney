@@ -153,7 +153,7 @@ func (AdminLog) TableName() string {
 
 // RequestLog Table
 type RequestLog struct {
-	ID           uint      `gorm:"primaryKey" json:"id"`
+	ID           uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	UserID       *uint     `gorm:"index" json:"user_id,omitempty"` // nullable for anonymous requests
 	Endpoint     string    `gorm:"type:varchar(500);not null;index" json:"endpoint"`
 	Method       string    `gorm:"type:varchar(10);not null" json:"method"`

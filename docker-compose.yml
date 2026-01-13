@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./disney_backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./disney_backend/.env
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  frontend:
+    build: ./disney_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+  
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"

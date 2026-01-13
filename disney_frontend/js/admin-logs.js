@@ -1,6 +1,6 @@
 // Admin Logs & Analytics JavaScript
 
-const API_BASE_URL = "http://localhost:8080/api";
+// API_BASE_URL is defined in config.js which uses API_BASE from docker_config.js
 
 // State Management
 const state = {

@@ -1,5 +1,6 @@
-// API Configuration
-const API_BASE_URL = "http://localhost:8080/api";
+// API Configuration - uses API_BASE from docker_config.js
+// Falls back to localhost for development if docker_config.js is not loaded
+const API_BASE_URL = typeof API_BASE !== 'undefined' ? `${API_BASE}/api` : "http://localhost:8080/api";
 
 const API_ENDPOINTS = {
   // Auth endpoints
