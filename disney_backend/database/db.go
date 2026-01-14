@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"disney/models"
 
@@ -52,6 +53,14 @@ func InitDB() {
 	}
 
 	DB = db
+	sqlDB, err := DB.DB()
+	if err != nil {
+		log.Fatal("Failed to get sql DB")
+	}
+
+	sqlDB.SetMaxOpenConns(5)        // 🔥 VERY IMPORTANT (Supabase safe)
+	sqlDB.SetMaxIdleConns(2)
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	log.Println("Database connected")
 
 	// Auto migrate tables
