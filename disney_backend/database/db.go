@@ -94,6 +94,7 @@ func fixSequences() {
 		"views":        "views_id_seq",
 		"admin_logs":   "admin_logs_id_seq",
 		"request_logs": "request_logs_id_seq",
+		"time_tables":  "time_tables_id_seq",
 	}
 
 	for table, sequence := range tables {
