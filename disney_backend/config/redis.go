@@ -13,38 +13,32 @@ var RedisClient *redis.Client
 
 // InitRedis initializes the Redis client connection
 func InitRedis() {
-	// Read from environment variables (Docker / Render / Local)
-	redisHost := os.Getenv("REDIS_HOST")
-	redisPort := os.Getenv("REDIS_PORT")
+	redisURL := os.Getenv("REDIS_URL")
 
-	// Fallback for local development
-	if redisHost == "" {
-		redisHost = "localhost"
-	}
-	if redisPort == "" {
-		redisPort = "6379"
+	if redisURL == "" {
+		log.Println("⚠️ REDIS_URL not set – Redis disabled")
+		return
 	}
 
-	addr := redisHost + ":" + redisPort
+	opt, err := redis.ParseURL(redisURL)
+	if err != nil {
+		log.Println("❌ Invalid REDIS_URL:", err)
+		return
+	}
 
-	RedisClient = redis.NewClient(&redis.Options{
-		Addr: addr,
-		DB:   0,
-	})
+	RedisClient = redis.NewClient(opt)
 
-	// Test the connection with a ping
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	pong, err := RedisClient.Ping(ctx).Result()
-	if err != nil {
-		log.Println("⚠️ Redis connection failed:", err)
+	if err := RedisClient.Ping(ctx).Err(); err != nil {
+		log.Println("❌ Redis connection failed:", err)
 		log.Println("⚠️ Recently viewed feature will be disabled")
 		RedisClient = nil
 		return
 	}
 
-	log.Println("✅ Redis connected successfully:", pong, "at", addr)
+	log.Println("✅ Redis connected successfully")
 }
 
 // CloseRedis closes the Redis connection
