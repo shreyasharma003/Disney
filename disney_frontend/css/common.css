@@ -50,7 +50,7 @@
 
 /* Dark Theme Background Image */
 [data-theme="dark"] body:not(.homepage-body) {
-  background-image: url("../src/dark-bg.png");
+  background-image: url("../src/dark_theme.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

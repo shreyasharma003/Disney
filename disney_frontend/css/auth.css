@@ -268,17 +268,22 @@
   }
 }
 /* Doraemon Cutout */
+/* Doraemon cutout: positioned relative to auth-card, peeking right, vertically centered */
+.auth-card {
+  position: relative;
+}
 .doraemon-cutout {
   position: absolute;
   top: 50%;
-  right: calc(50% - 280px);
+  right: -40px;
   transform: translateY(-50%);
   width: 100px;
   height: auto;
   opacity: 0.9;
-  z-index: 1;
+  z-index: 2;
   animation: float 3s ease-in-out infinite;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+  pointer-events: none;
 }
 
 @keyframes float {
@@ -294,25 +299,19 @@
 @media (max-width: 768px) {
   .doraemon-cutout {
     width: 70px;
-    right: calc(50% - 280px);
+    right: -28px;
   }
 }
 
 @media (max-width: 640px) {
   .doraemon-cutout {
-    width: 60px;
-    top: 10px;
-    right: 10px;
-    transform: translateY(0);
+    width: 54px;
+    right: -18px;
   }
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+}
+@media (max-width: 480px) {
+  .doraemon-cutout {
+    width: 44px;
+    right: -10px;
   }
 }
