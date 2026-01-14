@@ -1,14 +1,6 @@
 // Admin Logs & Analytics JavaScript
 
-// Ensure API_BASE_URL is available
-let API_BASE_URL;
-if (typeof window.API_BASE_URL !== 'undefined') {
-  API_BASE_URL = window.API_BASE_URL;
-} else if (typeof API_BASE !== 'undefined') {
-  API_BASE_URL = `${API_BASE}/api`;
-} else {
-  API_BASE_URL = "https://disney-79c7.onrender.com/api";
-}
+// API_BASE_URL is defined in config.js which is loaded before this script
 
 // State Management
 const state = {

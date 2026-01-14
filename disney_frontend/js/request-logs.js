@@ -1,11 +1,6 @@
 // Request Logs JavaScript
 
-// Ensure API_BASE_URL is available
-if (typeof API_BASE_URL === 'undefined') {
-  // Fallback if config.js hasn't loaded yet or API_BASE isn't available
-  const API_BASE_URL = typeof API_BASE !== 'undefined' ? `${API_BASE}/api` : "https://disney-79c7.onrender.com/api";
-  window.API_BASE_URL = API_BASE_URL;
-}
+// API_BASE_URL is defined in config.js which is loaded before this script
 
 // State Management
 const state = {
