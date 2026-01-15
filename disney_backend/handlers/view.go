@@ -28,11 +28,14 @@ func RecordView(c *gin.Context) {
 
 	var req RecordViewRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("ERROR: Invalid request body for view recording: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
+
+	log.Printf("INFO: Received view recording request - user_id=%d, cartoon_id=%d", userID, req.CartoonID)
 
 	// Check if cartoon exists (validation query)
 	var cartoon models.Cartoon

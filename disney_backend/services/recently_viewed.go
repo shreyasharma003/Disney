@@ -43,6 +43,8 @@ func AddRecentlyViewed(userId int, cartoonId int) error {
 	key := fmt.Sprintf("%s%d", RedisKeyPrefix, userId)
 	cartoonIDStr := strconv.Itoa(cartoonId)
 
+	log.Printf("DEBUG: AddRecentlyViewed called for user %d, cartoon %d", userId, cartoonId)
+
 	// Step 1: Remove the cartoon ID if it already exists in the list
 	// This ensures we don't have duplicates and maintains the "most recent" logic
 	err := redisClient.LRem(ctx, key, 0, cartoonIDStr).Err()
