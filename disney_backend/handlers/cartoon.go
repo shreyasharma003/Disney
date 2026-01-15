@@ -12,12 +12,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetAllCartoonNames returns all cartoon names with poster URLs for display
+// GetAllCartoonNames returns all cartoon names with poster URLs, year, and IMDb rating for display
 func GetAllCartoonNames(c *gin.Context) {
 	var cartoons []models.Cartoon
 
-	// Query ID, Title, and PosterURL fields for display
-	if err := database.DB.Select("id", "title", "poster_url").Find(&cartoons).Error; err != nil {
+	// Query ID, Title, PosterURL, and ReleaseYear fields for display
+	if err := database.DB.Select("id", "title", "poster_url", "release_year").Find(&cartoons).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to fetch cartoons",
 			"error":   err.Error(),
@@ -25,13 +25,18 @@ func GetAllCartoonNames(c *gin.Context) {
 		return
 	}
 
-	// Extract names and poster URLs into a simple array
+	// Extract cartoon data with IMDb ratings
 	var cartoonNames []map[string]interface{}
 	for _, cartoon := range cartoons {
+		// Fetch IMDb rating for each cartoon
+		imdbRating := services.FetchIMDbRating(cartoon.Title)
+
 		cartoonNames = append(cartoonNames, map[string]interface{}{
-			"id":         cartoon.ID,
-			"title":      cartoon.Title,
-			"poster_url": cartoon.PosterURL,
+			"id":           cartoon.ID,
+			"title":        cartoon.Title,
+			"poster_url":   cartoon.PosterURL,
+			"release_year": cartoon.ReleaseYear,
+			"imdb_rating":  imdbRating,
 		})
 	}
 
