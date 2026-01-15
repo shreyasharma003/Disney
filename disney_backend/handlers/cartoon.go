@@ -4,6 +4,7 @@ import (
 	"disney/database"
 	"disney/models"
 	"disney/services"
+	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -196,6 +197,25 @@ func GetCartoonByID(c *gin.Context) {
 			"error":   err.Error(),
 		})
 		return
+	}
+
+	// Track the viewed cartoon in recently viewed list
+	// This will add the cartoon to recently viewed when details are fetched
+	userID, exists := c.Get("userID")
+	if exists && userID != nil {
+		// userID from context is uint, convert to int
+		uid := int(userID.(uint))
+		cid := int(cartoon.ID)
+
+		// Add to recently viewed cache (async - don't block response if Redis fails)
+		go func() {
+			if err := services.AddRecentlyViewed(uid, cid); err != nil {
+				// Log error but don't fail the request
+				log.Printf("WARNING: Failed to add to recently viewed: %v", err)
+			} else {
+				log.Printf("SUCCESS: Added cartoon %d to recently viewed for user %d", cid, uid)
+			}
+		}()
 	}
 
 	// Fetch IMDb rating
