@@ -198,22 +198,6 @@ func GetCartoonByID(c *gin.Context) {
 		return
 	}
 
-	// Track the viewed cartoon in recently viewed list
-	userID, exists := c.Get("userID")
-	if exists && userID != nil {
-		// userID from context is uint, convert to int
-		uid := int(userID.(uint))
-		cid := int(cartoon.ID)
-
-		// Add to recently viewed cache (async - don't block response if Redis fails)
-		go func() {
-			if err := services.AddRecentlyViewed(uid, cid); err != nil {
-				// Log error but don't fail the request
-				// You can implement proper logging here
-			}
-		}()
-	}
-
 	// Fetch IMDb rating
 	imdbRating := services.FetchIMDbRating(cartoon.Title)
 
