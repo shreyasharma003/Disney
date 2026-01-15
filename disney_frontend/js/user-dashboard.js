@@ -749,32 +749,27 @@ function renderAllCartoonsPage(filteredData = null) {
     return;
   }
 
-  // Show loading skeleton while fetching details
-  container.innerHTML = `
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-  `;
-
-  // Load full details for each cartoon on the page
-  Promise.all(
-    pageCartoons.map(async (cartoon) => {
-      const detailResult = await apiRequest(`/admin/cartoons/${cartoon.id}`);
-      return detailResult && detailResult.ok ? detailResult.data.data : null;
-    })
-  ).then((detailedCartoons) => {
-    console.log("Detailed cartoons:", detailedCartoons);
-    container.innerHTML = "";
-    detailedCartoons.forEach((cartoon) => {
-      if (cartoon) {
-        console.log("Creating card for cartoon:", cartoon);
-        const cartoonId = cartoon.id || cartoon.cartoon_id;
-        const isFavorited = userFavorites.has(cartoonId);
-        const card = createCartoonCard(cartoon, true, isFavorited);
-        container.appendChild(card);
-      }
-    });
+  // Create cards directly from basic cartoon data (no need to fetch full details for display)
+  pageCartoons.forEach((cartoon) => {
+    if (cartoon) {
+      console.log("Creating card for cartoon:", cartoon);
+      const cartoonId = cartoon.id;
+      const isFavorited = userFavorites.has(cartoonId);
+      
+      // Create a basic cartoon object for display
+      const displayCartoon = {
+        id: cartoon.id,
+        title: cartoon.title,
+        description: "Click to view details", // Basic description
+        poster_url: "", // Will use placeholder
+        release_year: "", // Will be empty for basic view
+        genre: null,
+        age_group: null
+      };
+      
+      const card = createCartoonCard(displayCartoon, true, isFavorited);
+      container.appendChild(card);
+    }
   });
 
   // Update pagination controls
