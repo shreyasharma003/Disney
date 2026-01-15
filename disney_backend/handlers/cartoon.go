@@ -12,12 +12,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetAllCartoonNames returns all cartoon names
+// GetAllCartoonNames returns all cartoon names with poster URLs for display
 func GetAllCartoonNames(c *gin.Context) {
 	var cartoons []models.Cartoon
 
-	// Query only ID and Title fields
-	if err := database.DB.Select("id", "title").Find(&cartoons).Error; err != nil {
+	// Query ID, Title, and PosterURL fields for display
+	if err := database.DB.Select("id", "title", "poster_url").Find(&cartoons).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to fetch cartoons",
 			"error":   err.Error(),
@@ -25,12 +25,13 @@ func GetAllCartoonNames(c *gin.Context) {
 		return
 	}
 
-	// Extract names into a simple array
+	// Extract names and poster URLs into a simple array
 	var cartoonNames []map[string]interface{}
 	for _, cartoon := range cartoons {
 		cartoonNames = append(cartoonNames, map[string]interface{}{
-			"id":    cartoon.ID,
-			"title": cartoon.Title,
+			"id":         cartoon.ID,
+			"title":      cartoon.Title,
+			"poster_url": cartoon.PosterURL,
 		})
 	}
 

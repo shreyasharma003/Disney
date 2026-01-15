@@ -756,13 +756,13 @@ function renderAllCartoonsPage(filteredData = null) {
       const cartoonId = cartoon.id;
       const isFavorited = userFavorites.has(cartoonId);
       
-      // Create a basic cartoon object for display
+      // Create a display cartoon object using available data including poster_url
       const displayCartoon = {
         id: cartoon.id,
         title: cartoon.title,
-        description: "Click to view details", // Basic description
-        poster_url: "", // Will use placeholder
-        release_year: "", // Will be empty for basic view
+        description: "Click to view details",
+        poster_url: cartoon.poster_url || "", // Use the poster URL from API
+        release_year: "",
         genre: null,
         age_group: null
       };
